@@ -1,0 +1,22 @@
+#container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#top{
+    background-color: rgb(220, 235, 140);
+    padding-inline: 30px;
+    border-radius: 5%;
+}
+#main{
+    background-color: rgb(235, 218, 140);
+    padding-inline: 30px;
+    border-radius: 5%;
+}
+
+#back{
+    width: 70px;
+    height: 70px;
+    border-radius: 100%;
+}

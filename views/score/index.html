@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./index.css">
+    <title>scorebook</title>
+</head>
+<body>
+    <div id="container">
+        <div id="score" class="divide">
+            <div id="firstInnings">
+                <h3>name</h3>
+                <div class="score">
+                    <h3 id="runs1">0</h3> - <h3 id="wickets1">0</h3>
+                </div>
+                <div class="over"><a class="over">(<h4 id="over1">0</h4>.<h4 id="balls1">0</h4>/<h4 id="oversMatch">0</h4>)</a></div>
+            </div>
+            <div id="secondInnings">
+                <h3>name</h3>
+                <div class="score">
+                    <h3 id="runs2">0</h3> - <h3 id="wickets2">0</h3>
+                </div>
+                <div class="over"><a class="over">(<h4 id="over2">0</h4>.<h4 id="balls2">0</h4>/<h4 id="oversMatch">0</h4>)</a></div>
+            </div>
+        </div>
+        <hr>
+        <div>
+            <div id="currentOver">
+                <h4 id="currentBallerName">name</h4>
+                <a id="currentOverData"></a>
+                
+            </div>
+            <div id="allOvers">
+                <label>overs :</label>
+                <select name="allOverData" id="allOverData" ></select>
+            </div>
+        </div>
+        <hr>
+        <div id="playersStats" class="divide">
+            <div>
+                <div id="batterStats1" class="batterStats">
+                    <table id="battersTable1">
+                        <tr>
+                            <th>name</th>
+                            <th>runs</th>
+                            <th>balls</th>
+                            <th>sixes</th>
+                            <th>four</th>
+                            <th>sr</th>
+                        </tr>   
+                        
+                    </table>
+                </div>
+                <!-- <div>
+                    <input type="text" id="newBatterName">
+                    <button id="addBatter">Add Batter</button>
+                </div> -->
+                <hr>
+                <div id="ballerStats1">
+                    <table id="ballersTable1">
+                        <tr>
+                            <th>name</th>
+                            <th>overs</th>
+                            <th>wickets</th>
+                            <th>runs</th>
+                            <th>rr</th>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+            <div>
+                <div id="batterStats2" class="batterStats">
+                    <table id="battersTable2">
+                        <tr>
+                            <th>name</th>
+                            <th>runs</th>
+                            <th>balls</th>
+                            <th>sixes</th>
+                            <th>four</th>
+                            <th>sr</th>
+                        </tr>
+                        
+                    </table>
+                </div>
+                <hr>
+                <div id="ballerStats2">
+                    <table id="ballersTable2">
+                        <tr>
+                            <th>name</th>
+                            <th>overs</th>
+                            <th>wickets</th>
+                            <th>runs</th>
+                            <th>rr</th>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="./index.js"></script>
+</body>
+</html>

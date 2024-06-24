@@ -1,0 +1,135 @@
+#container{
+    background-color: rgb(222, 226, 160);
+    height: 600px;
+}
+#add{
+    background-color: black;
+    color: #f2f2f2;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+#wicketButton{
+    background-color: red;
+    width: 80px;
+    height: 40px;
+    border-radius: 7%;
+    color: #f2f2f2;
+}
+#oneRun{
+    background-color: rgb(248, 194, 194);
+    width: 30px;
+    height: 30px;
+}
+#fourRun{
+    background-color: rgb(235, 245, 146);
+    width: 40px;
+}
+#sixRun{
+    background-color: rgb(156, 162, 243);
+    height: 50px;
+}
+#cancle{
+    background-color: rgb(214, 47, 236);
+    color: #f2f2f2;
+    height: 40px;
+    width: 50px;
+    border-radius: 15%;
+}
+
+#currentOver {
+    background-color: rgb(238, 157, 58);
+    display: flex;
+    height: 30px;
+    margin-inline: 20px;
+    align-items: center;
+    padding-inline: 20px;
+    justify-content: space-around;
+}
+#currentOverData{
+    display: flex;
+    flex-direction: row;
+}
+
+#show{
+    width: 70px;
+    height: 35px;
+    background-color: #f2f2f2;
+}
+#updateButtons{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#byes{
+    background-color: yellow;
+    width: 50px;
+    height: 40px;
+    border-radius: 17%;
+}
+#wideBall{
+    background-color: rgb(215, 230, 241);
+    width: 55px;
+    height: 40px;
+    border-radius: 17%;
+}
+#noBall{
+    background-color: rgb(43, 7, 248);
+    width: 40px;
+    height: 40px;
+    border-radius: 17%;
+    color:#f2f2f2
+}
+
+#secondInningScenario{
+    display: flex;
+    flex-direction: column;
+}
+button{
+    padding-inline: 2px;
+    margin:3px;
+}
+.box{
+    background-color: rgb(98, 243, 98);
+    padding: 2px;
+    display: flex;
+    margin: 2px;
+}
+
+.score{
+    background-color: rgb(133, 100, 100);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-inline: 30px;
+}
+.batterStats{
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.divide{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.over{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+    height: 10px;
+}
+th {
+    background-color: #f2f2f2;
+}

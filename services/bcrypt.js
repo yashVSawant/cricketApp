@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-let salt = 10;
+const salt = 10;
 exports.createHash = (password)=>{
     return new Promise((res,rej) =>{
         bcrypt.hash(password ,salt ,async(err , hash)=>{
@@ -13,7 +13,7 @@ exports.createHash = (password)=>{
 
 exports.compareHash = (password ,hash)=>{
     return new Promise((res,rej)=>{
-        bcrypt.compare(password ,checkUser.password ,(err ,result)=>{
+        bcrypt.compare(password ,hash ,(err ,result)=>{
             if(err){
                 rej(err.message);
             }

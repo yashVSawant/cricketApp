@@ -3,13 +3,11 @@ const Sequelize = require('sequelize');
 const sequelize = require('../utils/database');
 
 const teamList = sequelize.define('teamList',{
-    userId:{
+    id:{
         type:Sequelize.INTEGER,
-        allowNull:false
-    },
-    teamId:{
-        type:Sequelize.INTEGER,
-        allowNull:false
+        allowNull:false,
+        autoIncrement:true,
+        primaryKey:true
     }
 });
 

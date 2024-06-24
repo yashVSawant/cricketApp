@@ -1,20 +1,19 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const user = require('../models/user');
+const organization = require('../models/organization');
 
 const authenticate = async(req,res,next)=>{
     try{
         const fullToken = req.header('Authorization');
+        if(!fullToken) throw new Error('access denied')
         const token = fullToken.split(" ")[1];
-        console.log(token)
-        const tokenUser = jwt.verify(token , process.env.TOKENKEY);
-        const checkUser = await user.findByPk(tokenUser.id);
-        if(!checkUser)throw new Error("Unauthorize user");
-        req.user = checkUser;
+        const tokenClient = jwt.verify(token , process.env.TOKENKEY);
+        const client = await organization.findByPk(tokenClient.id);
+        if(!client)throw new Error("Unauthorize user");
+        req.user = client;
         next();
     }catch(err){
-        // console.log(err)
         res.status(403).json({success:false , message:err.message});
     }
 }

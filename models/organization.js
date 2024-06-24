@@ -6,8 +6,8 @@ const organization = sequelize.define('organization',{
     name:{
         type:Sequelize.STRING
     },
-    representativeId:{
-        type:Sequelize.INTEGER,
+    email:{
+        type:Sequelize.STRING,
         alllowNull:false,
         unique:true
     },

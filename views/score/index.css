@@ -1,0 +1,41 @@
+#container{
+    background-color: rgb(222, 226, 160);
+    height: 600px;
+}
+
+.score{
+    background-color: rgb(133, 100, 100);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-inline: 30px;
+}
+.batterStats{
+    width:300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.divide{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.over{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}

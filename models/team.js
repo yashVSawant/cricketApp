@@ -5,10 +5,15 @@ const sequelize = require('../utils/database');
 const team = sequelize.define('team',{
     name:{
         type:Sequelize.STRING,
+        allowNull:false,
+    },
+    email:{
+        type:Sequelize.STRING,
+        unique:true,
         allowNull:false
     },
-    captainId:{
-        type:Sequelize.INTEGER,
+    password:{
+        type:Sequelize.STRING,
         allowNull:false
     }
 })

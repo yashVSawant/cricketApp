@@ -1,5 +1,5 @@
 
-const jtw = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const sequelize = require('../utils/database');
 
@@ -12,7 +12,7 @@ exports.getUserData =async(req,res)=>{
         const data = await userData.findOne({
             where:{userId:req.user.id}
         });
-        res.status(200).json({succcess:true ,data});
+        res.status(200).json({succcess:true ,data ,name:req.user.name});
     }catch(err){
         res.status(404).json({success:false ,message:err.message})
     }
@@ -31,7 +31,7 @@ exports.updateUserData =async(req,res)=>{
         })
         res.status(200).json({succcess:true ,data:updateData});
     }catch(err){
-        res.status(404).json({success:false ,message:err.message})
+        res.status(500).json({success:false ,message:err.message})
     }
 }
 
@@ -39,7 +39,7 @@ exports.signup = async(req,res)=>{
     const transaction = await sequelize.transaction();
     try{
         const {name , email  , password ,playerType} = req.body;
-        if(isNullValue(name) || isNullValue(email) || isNullValue(contactNo) || isNullValue(password) ||isNullValue(playerType)){
+        if(isNullValue(name) || isNullValue(email) || isNullValue(password) ||isNullValue(playerType)){
             throw new Error("invalid input!");
         }
 
@@ -57,9 +57,9 @@ exports.signup = async(req,res)=>{
         await transaction.commit();
             
     }catch(err){
-        // console.log(err);
+        console.log(err);
         await transaction.rollback();
-        res.status(403).json({message:err.message});
+        res.status(500).json({message:err.message});
     }
     
 }
@@ -76,10 +76,11 @@ exports.login = async(req,res)=>{
             await hashService.compareHash(password ,checkUser.password);
             res.status(200).json({success:true , token:generateAccessToken(checkUser.id,checkUser.name)});      
         }else{
-            res.status(403).json({success:false,message:"user not found"})
+            res.status(404).json({success:false,message:"user not found"})
         }
     }catch(err){
-        res.status(403).json({success:false,message:err.message})
+        console.log(err)
+        res.status(500).json({success:false,message:err.message})
     }
 }
 
@@ -88,5 +89,5 @@ function isNullValue(value){
 }
 
 function generateAccessToken(id, name ){
-    return jtw.sign({id,name},process.env.TOKENKEY);
+    return jwt.sign({id,name,role:'player'},process.env.TOKENKEY);
 }

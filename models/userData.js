@@ -21,11 +21,6 @@ const userData = sequelize.define('userData',{
         type:Sequelize.INTEGER,
         defaultValue:0,
         allowNull:false
-    },
-    userId:{
-        type:Sequelize.INTEGER,
-        allowNull:false,
-        unique:true
     }
 })
 

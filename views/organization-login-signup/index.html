@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>amchyaDhava</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <div id="container">
+        <div id="main">
+            
+            <div id="loginDiv" class="mainDiv" >
+                <div class="page">
+                    <div class="otherPage">
+                        <label>New organization ?:</label>
+                        <button id="signupPage"> Signup</button>
+                    </div>
+                </div>
+                <div class="inputs">
+                    <label>Enter Email :</label>
+                    <input type="email" id="LoginEmail">
+                    <label>Enter Password :</label>
+                    <input type="password" id="LoginPassword">
+                </div>
+                <button class="submit" id="login">Login</button>
+            </div>
+            <div id="signupDiv" class="mainDiv" style="display: none;">
+                <div class="page">
+                    <div class="otherPage">
+                        <label>Already have account ?:</label>
+                        <button id="loginPage">Login</button>
+                    </div>
+                </div>
+                <div class="inputs">
+                    <label>Enter Name :</label>
+                    <input type="text" id="name">
+                    <label>Enter Email :</label>
+                    <input type="email" id="email">
+                    <label>Enter taluka name :</label>
+                    <input type="text" id="taluka">
+                    <label>Enter village name :</label>
+                    <input type="text" id="village">
+                    <label>Enter Password :</label>
+                    <input type="password" id="password">
+                    <button class="submit" id="signup">Signup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="./index.js"></script>
+</body>
+</html>
