@@ -7,8 +7,12 @@ const organizationAuthentication = require('../middleware/organizationAuthentica
 
 const routes = express.Router();
 
-routes.post('/getTeam',organizationAuthentication.authenticate,controller.getTeam);
-routes.post('/postTeam',organizationAuthentication.authenticate,controller.postTeam);
-routes.post('/addPlayer',organizationAuthentication.authenticate,controller.addPlayerInTeam);
+routes.post('/match/players',organizationAuthentication.authenticate,controller.getPlayersAndTeam);
+routes.post('/',userAuthentication.authenticate,controller.postTeam);
+routes.get('/',userAuthentication.authenticate,controller.getTeam);
+routes.get('/:id/players',userAuthentication.authenticate,controller.getPlayers);
+routes.post('/addPlayer',userAuthentication.authenticate,controller.addPlayer);
+routes.delete('/:teamId/:id/remove',userAuthentication.authenticate,controller.removePlayer);
+
 
 module.exports = routes;

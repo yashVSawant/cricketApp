@@ -59,7 +59,8 @@ function displayTournaments(id , name , startDate , endDate , location){
 
 showTournaments.addEventListener('click',(e)=>{
     if(e.target.classList.value === 'start'){
-        localStorage.setItem('tournamentId',JSON.stringify(e.target.parentNode.id));
+        console.log(e.target.parentNode.id)
+        localStorage.setItem('tournamentId',(e.target.parentNode.id));
         window.location.href='../select-team/index.html';
     }
 })

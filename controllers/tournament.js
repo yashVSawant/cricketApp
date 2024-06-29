@@ -1,5 +1,6 @@
 const tournament = require('../models/tournament');
 const organization = require('../models/organization');
+const match = require('../models/match');
 const { Op } = require('sequelize');
 const hashService = require('../services/bcrypt');
 
@@ -15,10 +16,10 @@ exports.ongoingTournaments = async(req,res)=>{
                     [Op.gte]: today
                 }
             },
-            // include: [{
-            //     model: organization,
-            //     attributes: ['name']
-            // }]
+            include: [{
+                model: organization,
+                attributes: ['name']
+            }]
         })
         res.status(200).json({success:true , info});
     }catch (err) {
@@ -57,3 +58,4 @@ exports.getTournaments = async(req,res)=>{
         res.status(500).json({success:false,message: err.message});
     }
 }
+

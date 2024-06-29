@@ -5,6 +5,8 @@ const sequelize = require('../utils/database');
 
 const user = require('../models/user');
 const userData = require('../models/userData');
+const batterLiveData = require('../models/batterLiveData');
+const bowlerLiveData = require('../models/bowlerLiveData');
 const hashService = require('../services/bcrypt');
 
 exports.getUserData =async(req,res)=>{
@@ -18,18 +20,50 @@ exports.getUserData =async(req,res)=>{
     }
 }
 
-exports.updateUserData =async(req,res)=>{
+exports.updateBattingData =async(req,res)=>{
     try{
-        const { runs ,wickets} = req.body;
-        const data = await userData.findOne({
-            where:{userId:req.user.id}
-        });
-        const updateData = await data.update({
-            matches : data.matches + +1,
-            runs :data.runs + +runs,
-            wickets :data.wickets + +wickets
-        })
-        res.status(200).json({succcess:true ,data:updateData});
+        const {id} = req.body;
+        const getLiveData = await batterLiveData.findOne({where:{userId:id}});
+        if(getLiveData){
+            const data = await userData.findOne({
+                where:{userId:id}
+            });
+            let highestScore = data.highestScore;
+            if((+getLiveData.runs) > data.highestScore)highestScore = +getLiveData.runs
+            await data.update({
+                runs :data.runs + +getLiveData.runs,
+                sixes :data.sixes + +getLiveData.sixes,
+                fours:data.fours + +getLiveData.fours,
+                balls:data.balls + +getLiveData.balls,
+                highestScore:highestScore
+            })
+            res.status(200).json({succcess:true });
+        }else{
+            throw new Error('user is not playing currently!')
+        }
+    }catch(err){
+        res.status(500).json({success:false ,message:err.message})
+    }
+}
+exports.updateBowlingData =async(req,res)=>{
+    try{
+        const {id} = req.body;
+        const getLiveData = await bowlerLiveData.findOne({where:{userId:id}});
+        if(getLiveData){
+            const data = await userData.findOne({
+                where:{userId:id}
+            });
+            let highestWickets = data.highestWickets;
+            if((+getLiveData.wickets) > data.highestWickets)highestWickets = +getLiveData.wickets
+            await data.update({
+                wickets :data.wickets + +getLiveData.wickets,
+                overs :data.overs + +getLiveData.overs,
+                highestWickets: highestWickets
+            })
+            res.status(200).json({succcess:true });
+        }else{
+            throw new Error('user is not playing currently!')
+        }
     }catch(err){
         res.status(500).json({success:false ,message:err.message})
     }

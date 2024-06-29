@@ -15,6 +15,11 @@ const user = sequelize.define('user',{
     password:{
         type:Sequelize.STRING,
         allowNull:false
+    },
+    isPlaying:{
+        type:Sequelize.BOOLEAN,
+        allowNull:false,
+        defaultValue:false
     }
 })
 

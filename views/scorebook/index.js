@@ -1,3 +1,7 @@
+const socket = io();
+const tournamentId = (localStorage.getItem('tournamentId'));
+const token = localStorage.getItem('token');
+const matchId = localStorage.getItem('matchId');
 let runs = 0;
 let target = 0;
 let wickets = 0;
@@ -53,6 +57,10 @@ const changeStrike = document.getElementById('changeStrike');
 const player1 = document.getElementById('batterStats1');
 const player2 = document.getElementById('batterStats2');
 
+socket.on('getUpdate',(data,typeOfdata)=>{
+    console.log(data , typeOfdata)
+})
+
 window.addEventListener('DOMContentLoaded',()=>{
     const oversMatch1 = document.getElementById('oversMatch1');
     const oversMatch2 = document.getElementById('oversMatch2');
@@ -86,6 +94,8 @@ window.addEventListener('DOMContentLoaded',()=>{
         showPlayer(2,player.id, player.name)
         
     })
+    
+    socket.emit('watch-score',tournamentId);
 })
 
 
@@ -132,7 +142,7 @@ add.onclick = ()=>{
     else{
         try {
                 updatebatterRuns();
-                updatePlayerScore();
+                displayBatterStats();
                 updateCurrentOver();
                 updateScore();
                 displayRuns();
@@ -144,6 +154,7 @@ add.onclick = ()=>{
                 clearShowDiv();
                 isMatchOver();
                 isOver();
+                uploadScore();
             } catch (error) {
                 console.log(error)
             alert('somthing went wrong');
@@ -248,25 +259,17 @@ player2.addEventListener('click',(e)=>{
     
 })
 
-// function enterBatterName(){
-//     const batterName = prompt("Enter batters name :");
-//     batterCount++;
-//     createNewBatter(batterCount,batterName);
-// }
-
-// function enterBallersName(){
-//     const ballersName = prompt("Enter ballers name :");
-//     ballerCount++;
-//     createNewBaller(ballerCount,ballersName);
-// }
-
 function updateBowlerStats(){
-    if(extra === 'wide!'|| extra === 'no!')currentBallerRuns++;
-    if(extra != 'byes!')currentBallerRuns += currentBall;
+    if(extra === 'wide!'|| extra === 'no!'){
+        currentBallerRuns++;
+    }
+    if(extra != 'byes!'){
+        currentBallerRuns += currentBall;
+    }
 }
 
 function displayBowler(){
-    id=bowlerId;
+    const id=bowlerId;
     const oversBowled = document.getElementById(`${inning}ballerOvers${id}`); 
     const runsGiven = document.getElementById(`${inning}ballerRuns${id}`);
     const runRate = document.getElementById(`${inning}rr${id}`);
@@ -274,28 +277,43 @@ function displayBowler(){
     else oversBowled.innerText = `${bowlerOvers}.${balls}`;
     runsGiven.innerText = currentBallerRuns;
     runRate.innerText = (Math.round(currentBallerRuns/((bowlerOvers*6)+balls)*6)*100)/100;
-
-    // console.log(currentBallerOvers)
-    
+    const overdata = bowlerOvers*10+balls;
+    socket.emit('bowler-update',bowlerId,inning,overdata ,currentBallerRuns, tournamentId);
+    const overNumber = ((bowlerOvers*10)+balls);
+    axios.put(`/match/api/${matchId}/bowler/updates`,{userId:id,runs:currentBallerRuns,overs:overNumber},{headers:{'Authorization':token}})
 }
 
 function updatebatterRuns(){
     if(strike1){
-        if(declaire === "four")batter1Fours++;
-        if(declaire === "six")batter1Sixes++;
-        if(extra !='wide!')batter1balls++;
-        if(extra !='byes!' && extra !='wide!')batter1Runs += currentBall;
-        // console.log("1",batter1Runs ,currentBall)
+        if(declaire === "four"){
+            batter1Fours++;
+        }
+        if(declaire === "six"){
+            batter1Sixes++;
+        }
+        if(extra !='wide!'){
+            batter1balls++;
+        }
+        if(extra !='byes!' && extra !='wide!'){
+            batter1Runs += currentBall;
+        }
     }else{
-        if(declaire === "four")batter2Fours++;
-        if(declaire === "six")batter2Sixes++;
-        if(extra !='wide!')batter2balls++;
-        if(extra !='byes!' && extra !='wide!')batter2Runs += currentBall;
-        // console.log("2",batter2Runs ,currentBall)
+        if(declaire === "four"){
+            batter2Fours++;
+        }
+        if(declaire === "six"){
+            batter2Sixes++;
+        }
+        if(extra !='wide!'){
+            batter2balls++;
+        }
+        if(extra !='byes!' && extra !='wide!'){
+            batter2Runs += currentBall;
+        }
     }
 }
 
-function updatePlayerScore(){
+function displayBatterStats(){
     let id;
     if(strike1)id=onCrease1;
     else id=onCrease2;
@@ -311,12 +329,16 @@ function updatePlayerScore(){
         batterSixes.innerText = batter1Sixes;
         batterFours.innerText = batter1Fours;
         batterSr.innerText = Math.round((batter1Runs/batter1balls)*100)/100;
+        socket.emit('batter-update',onCrease1,inning,batter1Runs,batter1Sixes,batter1Fours,batter1balls, tournamentId);
+        axios.put(`/match/api/${matchId}/batter/updates`,{userId:onCrease1,runs:batter1Runs,fours:batter1Fours,sixes:batter1Sixes,balls:batter1balls,state:'not out'},{headers:{'Authorization':token}})
     }else {
         batterRuns.innerText = batter2Runs;
         batterBalls.innerText = batter2balls; 
         batterSixes.innerText = batter2Sixes;
         batterFours.innerText = batter2Fours;
         batterSr.innerText = Math.round((batter2Runs/batter2balls)*100)/100;
+        socket.emit('batter-update',onCrease2,inning,batter2Runs,batter2Sixes,batter2Fours,batter2balls, tournamentId);
+        axios.put(`/match/api/${matchId}/batter/updates`,{userId:onCrease2,runs:batter2Runs,fours:batter2Fours,sixes:batter2Sixes,balls:batter2balls,state:'not out'},{headers:{'Authorization':token}})
     }
     if(declaire != 'runs'){
         if((currentBall%2 === 1)){
@@ -341,8 +363,9 @@ function createNewBaller(id,name){
                         <td id="${inning}rr${id}">0</td>
                         
     `;
+    socket.emit('new-bowler',id,inning, tournamentId);
     table.appendChild(row);
-    
+    axios.post(`/match/api/${matchId}/bowler/updates`,{userId:id},{headers:{'Authorization':token}})
 };
 
 function createNewBatter(id,name,teamNo){
@@ -358,10 +381,9 @@ function createNewBatter(id,name,teamNo){
         <td id="${teamNo}sr${id}">0</td>
         <button class="addInAction"> + </button>
     `;
-
-    // battersTable.appendChild(batterRow);
+    socket.emit('new-batter',id,inning, tournamentId);
     table.appendChild(row);
-    
+    axios.post(`/match/api/${matchId}/batter/updates`,{userId:id},{headers:{'Authorization':token}})
     addBatterOnField(id);
 }
 
@@ -378,9 +400,15 @@ function showPlayer(teamNo,id ,name){
 }
 
 function updateScore(){
-    if(extra === 'WICKET!')wickets++;
-    if(extra === 'wide!')runs++;
-    if(extra === 'no!')runs++;
+    if(extra === 'WICKET!'){
+        wickets++;   
+    }
+    if(extra === 'wide!'){
+        runs++;   
+    }
+    if(extra === 'no!'){
+        runs++;
+    }
     // console.log(currentBall)
     runs += currentBall;
     // console.log(currentBall , runs);
@@ -389,11 +417,15 @@ function updateScore(){
 function displayRuns(){
     const showRuns = document.getElementById(`runs${inning}`);
     showRuns.innerText = runs;
+    socket.emit('score',inning,runs ,'runs', tournamentId,overs ,balls,);
 }
 function displayWickets(){
-    if(extra==='WICKET!'){const showWickets = document.getElementById(`wickets${inning}`);
-    showWickets.innerText = wickets;
-    whichBatter();}
+    if(extra==='WICKET!'){
+        const showWickets = document.getElementById(`wickets${inning}`);
+        showWickets.innerText = wickets;
+        socket.emit('score',inning,wickets ,'wickets', tournamentId,overs ,balls);
+        whichBatter();
+    }
 }
 function whichBatter(){
     const id = bowlerId
@@ -481,7 +513,8 @@ function isOver(){
     }
     
 }
-function inningEnd(){
+async function inningEnd(){
+    await axios.put(`/match/api/${matchId}/update`,{inning,runs,wickets,overs,balls},{headers:{'Authorization':token}});
     target = runs;
     runs = 0;
     wickets = 0;
@@ -500,10 +533,12 @@ function inningEnd(){
     bowlerId = 0 ;
     clearBatter1Data();
     clearBatter2Data();
+    clearBowlerData();
     
 }
 
-function matchEnd(){
+async function matchEnd(){
+    await axios.put(`/match/api/${matchId}/update`,{inning,runs,wickets,overs,balls},{headers:{'Authorization':token}});
     const team1Name = document.getElementById('team1Name').innerText;
     const team2Name = document.getElementById('team2Name').innerText;
     const updateButtons = document.getElementById('updateButtons');
@@ -516,16 +551,19 @@ function matchEnd(){
     alert('match end');
     inningEnd();
     updateButtons.style.display = 'none'
+    await axios.put(`/match/api/${matchId}/endMatch`,{},{headers:{'Authorization':token}});
     window.location.href = '../organization-home/index.html'
 }
 
-function isInningOver(){
+async function isInningOver(){
     if(overs === +matchOvers || wickets == 10){
         
         if(inning===1){
+            
             inningEnd();
             alert('first inning completed second inning starting');
         }else{
+            
             matchEnd();
         }
     }else{
@@ -568,7 +606,20 @@ function completeWicketProcess(id,button ,bId){
             battersName.innerText = `${name} (${type})`;
             addTypeOfWicket.parentNode.parentNode.style.backgroundColor = 'white'
             addTypeOfWicket.parentNode.parentNode.removeChild(addTypeOfWicket.parentNode);
-            if(type === 'bowled' || type==='stump' || type ==='catch')addWicketToBaller(bId);
+            if(type === 'bowled' || type==='stump' || type ==='catch')addWicketToBaller(bId,type);
+            (async function execute(){
+                try {   
+                    if(id === onCrease1)await axios.put(`/match/api/${matchId}/batter/updates`,{userId:id,runs:batter1Runs,fours:batter1Fours,sixes:batter1Sixes,balls:batter1balls,state:`${type}`},{headers:{'Authorization':token}})
+                        else await axios.put(`/match/api/${matchId}/batter/updates`,{userId:id,runs:batter2Runs,fours:batter2Fours,sixes:batter2Sixes,balls:batter2balls,state:`${type}`},{headers:{'Authorization':token}})
+                
+                    await axios.put(`/match/api/${matchId}/update`,{inning,runs,wickets,overs,balls},{headers:{'Authorization':token}});
+                
+                } catch (err) {
+                    console.log(err)
+                }
+                
+            })();
+            socket.emit('batter-out' ,id ,inning,type,'wicket',tournamentId)
             if(id === onCrease1){
                 clearBatter1Data();
             }else{
@@ -618,14 +669,23 @@ function clearBowlerData(){
     currentBallerRuns=0;
 }
 
-function addWicketToBaller(id){
-    console.log(id)
+async function addWicketToBaller(id){
     const wicketsTaken = document.getElementById(`${inning}ballerWickets${id}`);
-    console.log(wicketsTaken);
     const wickets = +(wicketsTaken.innerText);
     wicketsTaken.innerText = wickets+1;
+    socket.emit('bowler-wicket',id,inning,wickets+1 , tournamentId);
+    await axios.put(`/match/api/${matchId}/bowler/wicket/updates`,{userId:id,wickets:wickets+1},{headers:{'Authorization':token}})
 }
 function addBatterOnField(id){
     if(onCrease1===0)onCrease1 = id;
     else onCrease2 =id;
+}
+
+async function uploadScore(){
+    try {
+        await axios.put(`/match/api/${matchId}/update`,{inning,runs,wickets,overs,balls},{headers:{'Authorization':token}});
+    } catch (err) {
+        console.log(err)
+    }
+    
 }

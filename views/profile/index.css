@@ -11,7 +11,7 @@
 }
 #main{
     background-color: rgb(235, 218, 140);
-    padding-inline: 30px;
+    padding-inline: 90px;
     border-radius: 5%;
 }
 
@@ -19,4 +19,9 @@
     width: 70px;
     height: 70px;
     border-radius: 100%;
+}
+
+.stats{
+    display: flex;
+    flex-direction: row;
 }

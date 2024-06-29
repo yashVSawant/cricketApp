@@ -21,6 +21,36 @@ const userData = sequelize.define('userData',{
         type:Sequelize.INTEGER,
         defaultValue:0,
         allowNull:false
+    },
+    sixes:{
+        type:Sequelize.INTEGER,
+        defaultValue:0,
+        allowNull:false
+    },
+    fours:{
+        type:Sequelize.INTEGER,
+        defaultValue:0,
+        allowNull:false
+    },
+    balls:{
+        type:Sequelize.INTEGER,
+        defaultValue:0,
+        allowNull:false
+    },
+    highestScore:{
+        type:Sequelize.INTEGER,
+        defaultValue:0,
+        allowNull:false
+    },
+    highestWickets:{
+        type:Sequelize.INTEGER,
+        defaultValue:0,
+        allowNull:false
+    },
+    overs:{
+        type:Sequelize.INTEGER,
+        defaultValue:0,
+        allowNull:false
     }
 })
 

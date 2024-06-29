@@ -126,7 +126,7 @@ table {
 }
 th, td {
     border: 1px solid black;
-    padding: 8px;
+    padding-inline: 5px;
     text-align: left;
     height: 10px;
 }

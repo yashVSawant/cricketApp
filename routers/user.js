@@ -9,6 +9,7 @@ routes.post('/signup',controller.signup);
 routes.post('/login',controller.login);
 
 routes.get('/data',authentication.authenticate ,controller.getUserData);
-routes.put('/data/update',authentication.authenticate ,controller.updateUserData);
+routes.put('/data/update/batting',authentication.authenticate ,controller.updateBattingData);
+routes.put('/data/update/bowlings',authentication.authenticate ,controller.updateBowlingData);
 
 module.exports = routes;
