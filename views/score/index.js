@@ -35,8 +35,8 @@ window.addEventListener('DOMContentLoaded',async()=>{
         const name = document.getElementById(`batterName${p.userId}`).innerText
         const inning = row.class;
         console.log(inning);
-        console.log(p,p.userId ,inning,p.runs,p.sixes,p.fours,p.balls,name)
-        displayBatterStats(p.userId ,inning,p.runs,p.sixes,p.fours,p.balls,name);
+        console.log(p,p.userId ,inning,p.runs,p.sixes,p.fours,p.balls,name,p.state)
+        displayBatterStats(p.userId ,inning,p.runs,p.sixes,p.fours,p.balls,name,p.state);
         row.parentNode.removeChild(row);
     })
     bowlersData.data.bowler.forEach((p)=>{
@@ -49,7 +49,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
         console.log(p.id ,1,p.runs,p.wickets ,p.overs,name)
     })
     socket.emit('watch-score',tournamentId);
-    socket.emit('updates',tournamentId);
+    // socket.emit('updates',tournamentId);
 })
 
 socket.on('batter',( id ,inning,runs ,sixes ,fours ,balls)=>{
@@ -73,8 +73,8 @@ socket.on('out',( id ,inning,value,type)=>{
 })
 
 socket.on('get-score',( inning ,value,type,overs ,balls)=>{
-    console.log( inning ,value,type)  
-    updateOver(overs ,balls)
+    console.log( inning ,value,type,overs ,balls)  
+    updateOver(inning ,overs ,balls)
     if(type === 'runs'){
         updateteamRuns(inning ,value)
     }else if(type === 'wickets'){
@@ -99,9 +99,10 @@ socket.on('new-bowler-id',( id ,inning)=>{
 })
 
 function updateBatterWicket(id ,inning,type){
-    const battersName = document.getElementById(`batterName${id}`);
-    const name = battersName.innerText;
-    battersName.innerText = `${name} (${type})`;
+    const row = document.getElementById(id);
+    const div = document.createElement('div');
+    div.innerHTML = `<a>( ${type} )</a>`;
+    row.appendChild(div);
 }
 
 function updateBowlerWickets(id ,inning,wickets){
@@ -109,7 +110,7 @@ function updateBowlerWickets(id ,inning,wickets){
 }
 
 function updateBowlerStats(id ,inning,over,runs){
-    const overs = over/10;
+    let overs = over/10;
     if(over%6 === 0)overs = over/6;
     document.getElementById(`${inning}ballerOvers${id}`).innerText = overs;
     // document.getElementById(`${inning}ballerWickets${id}`)
@@ -138,12 +139,16 @@ function updateTeamWicket(inning ,value){
     const wicket =  document.getElementById(`wickets${inning}`);
     wicket.innerText = value;
 }
-function updateOver(overs ,balls){
+function updateOver(inning,overs ,balls){
+    if(balls === 6){
+        balls = 0;
+        overs++
+    }
     document.getElementById(`overs${inning}`).innerText = overs;
     document.getElementById(`balls${inning}`).innerText = balls;
 }
 
-function displayBatterStats(id ,inning,runs,sixes,fours,balls,name){
+function displayBatterStats(id ,inning,runs,sixes,fours,balls,name,state){
     console.log(id ,inning,runs,sixes,fours,balls,name)
     const table = document.getElementById(`battersTable${inning}`);
     const row = document.createElement('tr');
@@ -157,6 +162,7 @@ function displayBatterStats(id ,inning,runs,sixes,fours,balls,name){
         <td id="${inning}sixes${id}">${sixes}</td>
         <td id="${inning}fours${id}">${fours}</td>
         <td id="${inning}sr${id}">${sr}</td>
+        <a>${state}</a>
     `;
     table.appendChild(row);
 } 
@@ -228,6 +234,7 @@ function createNewBatter(id,name,teamNo){
         <td id="${teamNo}sixes${id}">0</td>
         <td id="${teamNo}fours${id}">0</td>
         <td id="${teamNo}sr${id}">0</td>
+        <a>not out</a>
     `;
     table.appendChild(row);
 }
@@ -235,8 +242,8 @@ function createNewBatter(id,name,teamNo){
 function displayTeamName(name1 ,name2 ,overs){
     const team1Name = document.getElementById('team1Name');
     const team2Name = document.getElementById('team2Name');
-    document.getElementById('oversMatch1') = overs;
-    document.getElementById('oversMatch2') = overs;
+    document.getElementById('oversMatch1').innerText = overs;
+    document.getElementById('oversMatch2').innerText = overs;
     team1Name.innerText =name1;
     team2Name.innerText =name2
 }

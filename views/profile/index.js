@@ -1,18 +1,26 @@
 const host = 'http://localhost:3333';
 const token = localStorage.getItem('token');
 const back = document.getElementById('back');
+const upload = document.getElementById('upload');
 
 window.addEventListener('DOMContentLoaded',async()=>{
-
-
-    const data = await axios.get(`${host}/user/api/data`,{headers:{'Authorization':token}});
-    const playerData = data.data.data;
-    // console.log(playerData , data)
-    display(data.data.name ,playerData.playerType ,playerData.matches ,playerData.runs ,playerData.wickets,playerData.fours,playerData.sixes,playerData.highestScore,playerData.highestWickets,playerData.balls,playerData.overs);
+    try {
+        const data = await axios.get(`${host}/user/api/data`,{headers:{'Authorization':token}});
+        const playerData = data.data.data;
+        // console.log(playerData , data)
+        display(data.data.name ,playerData.playerType ,playerData.matches ,playerData.runs ,playerData.wickets,playerData.fours,playerData.sixes,playerData.highestScore,playerData.highestWickets,playerData.balls,playerData.overs);
+        dispalyPhoto(playerData.imageUrl)
+    } catch (error) {
+        alert(err.response.data.message);
+    }
 });
 
 back.onclick = ()=>{
     window.location.href = '../home/index.html';
+}
+upload.onclick = ()=>{
+    const photoFile = document.getElementById('photoFile').files[0];
+    uploadPhoto(photoFile);
 }
 
 function display(plName ,plPlayerType ,plMatches ,plRuns ,plWickets,plFours,plSixes,plhighestScore,plhighestWickets,plBalls,plOvers){
@@ -40,5 +48,45 @@ function display(plName ,plPlayerType ,plMatches ,plRuns ,plWickets,plFours,plSi
     highestWickets.innerText = plhighestWickets;
     overs.innerText = plOvers;
 
+    
+
 }
 
+function uploadPhoto(file){
+// const file = document.getElementById('file').files[0]
+// console.log(file)
+    const MIME_TYPE = "image/jpeg";
+    const QUALITY = 0.85;
+    const blobURL = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = blobURL;
+    img.onload = function () {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, 320, 180);
+    URL.revokeObjectURL(this.src);
+    canvas.toBlob(async(blob) => {
+       
+                console.log(blob)
+                const formData = new FormData();
+                formData.append('file', blob);
+                const data = await axios.post(`/user/api/data/photo`,formData,{headers:{'Authorization':token,'Content-Type': 'multipart/form-data'},'enctype':"multipart/form-data"})
+                    .catch((err)=>{alert(err.response.data.message)});
+                dispalyPhoto(data.data.imageUrl);
+            },
+            MIME_TYPE,
+            QUALITY
+        );
+    
+    }
+}
+
+function dispalyPhoto(url){
+    if(url){
+        const div = document.getElementById('image');
+        const image = document.createElement('img');
+        image.src = url;
+        div.innerHTML = '';
+        div.appendChild(image);
+    }
+}

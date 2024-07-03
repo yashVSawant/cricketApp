@@ -7,6 +7,9 @@ const userData = sequelize.define('userData',{
         type:Sequelize.STRING,
         allowNull:false
     },
+    imageUrl:{
+        type:Sequelize.STRING
+    },
     matches:{
         type:Sequelize.INTEGER,
         defaultValue:0,

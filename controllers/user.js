@@ -2,12 +2,55 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const sequelize = require('../utils/database');
+const { Op } = require('sequelize');
 
 const user = require('../models/user');
 const userData = require('../models/userData');
 const batterLiveData = require('../models/batterLiveData');
 const bowlerLiveData = require('../models/bowlerLiveData');
 const hashService = require('../services/bcrypt');
+const s3Services = require('../services/s3Services');
+
+exports.batterLeaderboard = async(req,res)=>{
+    try {
+        const top5 = await userData.findAll({
+            attributes: ['runs'],
+            include: [
+              {
+                model: user,
+                attributes: ['name'],
+                
+              }
+            ],
+            order: [['runs', 'DESC']],
+            limit: 5
+          });
+        res.status(200).json({succcess:true ,top5});
+    }catch(err){
+        console.log(err)
+        res.status(500).json({success:false ,message:err.message})
+    }
+}
+exports.bowlerLeaderboard = async(req,res)=>{
+    try {
+        const top5 = await userData.findAll({
+            attributes: ['wickets'],
+            include: [
+              {
+                model: user,
+                attributes: ['name'],
+                
+              }
+            ],
+            order: [['wickets', 'DESC']],
+            limit: 5
+          });
+        res.status(200).json({succcess:true ,top5});
+    }catch(err){
+        console.log(err)
+        res.status(500).json({success:false ,message:err.message})
+    }
+}
 
 exports.getUserData =async(req,res)=>{
     try{
@@ -67,6 +110,22 @@ exports.updateBowlingData =async(req,res)=>{
     }catch(err){
         res.status(500).json({success:false ,message:err.message})
     }
+}
+exports.postPhoto = async(req,res,next)=>{
+    try{
+        const {id} = req.user;
+        const getfile = req.file;
+        // console.log(getfile)
+        const filename = `profilePhoto/${id}.jpg`;
+        const imageUrl = await s3Services.uploadToS3(getfile,filename);
+        // console.log(fileUrl);
+        await userData.update({imageUrl:imageUrl},{where:{userId:id}});
+        res.status(201).json({success:true,imageUrl:imageUrl});
+    }catch(err){
+        console.log(err)
+        res.status(500).json({success:false})
+    }
+   
 }
 
 exports.signup = async(req,res)=>{

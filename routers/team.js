@@ -13,6 +13,7 @@ routes.get('/',userAuthentication.authenticate,controller.getTeam);
 routes.get('/:id/players',userAuthentication.authenticate,controller.getPlayers);
 routes.post('/addPlayer',userAuthentication.authenticate,controller.addPlayer);
 routes.delete('/:teamId/:id/remove',userAuthentication.authenticate,controller.removePlayer);
+routes.delete('/:id',userAuthentication.authenticate,controller.deleteTeam);
 
 
 module.exports = routes;

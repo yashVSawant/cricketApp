@@ -4,6 +4,8 @@ const showTeam = document.getElementById('showTeam');
 const createTeam = document.getElementById('createTeam');
 const displayPlayers = document.getElementById('displayPlayers');
 const create = document.getElementById('create');
+const leaderboard = document.getElementById('leaderboard')
+const displayLeaderBoard = document.getElementById('displayLeaderBoard');
 
 let teamId = 0;
 
@@ -52,7 +54,7 @@ create.onclick = async()=>{
                 displayTeam(post.data.team.id ,post.data.team.name);
             } catch (err) {
                 console.log(err)
-                alert('something went wrong!')
+                alert(err.response.data.message)
             }
         }else{
             alert('password did not match')
@@ -73,18 +75,50 @@ tournaments.addEventListener('click',(e)=>{
 
 showTeam.addEventListener('click',async(e)=>{
     if(e.target.classList.value === 'player'){
-        const id = e.target.parentNode.id;
-        const data = await axios.get(`/team/api/${id}/players`,{headers:{'Authorization':token}});
-        tournaments.style.display = 'none';
-        displayPlayers.innerHTML= '';
-        addBackButton();
-        displayInputDiv();
-        data.data.players.forEach((p)=>{
-            showPlayers(p.id ,p.name);
-        })
-        teamId = e.target.parentNode.id;
+        try {
+            const id = e.target.parentNode.id;
+            const data = await axios.get(`/team/api/${id}/players`,{headers:{'Authorization':token}});
+            tournaments.style.display = 'none';
+            displayLeaderBoard.innerHTML= '';
+            // displayPlayers.style.display = 'inline'
+            displayPlayers.innerHTML= '';
+            addBackButton(displayPlayers);
+            addDeleteButton()
+            displayInputDiv();
+            data.data.players.forEach((p)=>{
+                showPlayers(p.id ,p.name);
+            })
+            teamId = e.target.parentNode.id;
+        } catch (err) {
+            alert(err.response.data.message)
+        }
+        
     }
 })
+
+leaderboard.onclick = async()=>{
+    displayPlayers.innerHTML= '';
+    tournaments.style.display = 'none';
+    
+    displayLeaderBoard.innerHTML = `<div id="batter"><div>Batter</div></div>
+                <div id="bowler"><div>Bowler</div></div>`
+                
+    addBackButton(displayLeaderBoard);
+    try {
+        const batterData = await axios.get('/user/api/top5/batter',{headers:{'Authorization':token}});
+        const bowlerData = await axios.get('/user/api/top5/bowler',{headers:{'Authorization':token}});
+        batterData.data.top5.forEach((b)=>{
+            displayBatterBoard(b.user.name  , b.runs)
+        })
+        bowlerData.data.top5.forEach((b)=>{
+            displayBowlerBoard(b.user.name  , b.wickets)
+        })
+    } catch (err) {
+        alert(err.response.data.message)
+    }
+    
+    
+}
 
 displayPlayers.addEventListener('click',async(e)=>{
     if(e.target.classList.value === 'remove'){
@@ -93,13 +127,27 @@ displayPlayers.addEventListener('click',async(e)=>{
             await axios.delete(`/team/api/${teamId}/${id}/remove`,{headers:{'Authorization':token}});
             e.target.parentNode.parentNode.removeChild(e.target.parentNode)
         } catch (err) {
-            console.log(err)
-            alert('something went wrong')
+            alert(err.response.data.message)
         }
         
 
     }
 })
+
+function displayBatterBoard(name,runs){
+    const div = document.createElement('div');
+    div.className = 'leaderboard'
+    div.innerHTML = `<h3>${name}</h3>     -     <h3>${runs}</h3>`;
+
+    document.getElementById('batter').appendChild(div);
+}
+function displayBowlerBoard(name,runs){
+    const div = document.createElement('div');
+    div.className = 'leaderboard'
+    div.innerHTML = `<h3>${name}</h3>     -     <h3>${runs}</h3>`;
+
+    document.getElementById('bowler').appendChild(div);
+}
 
 function displayTournaments(id , name , startDate , endDate , location){
     const div = document.createElement('div');
@@ -129,16 +177,39 @@ function showPlayers(id ,name){
     displayPlayers.appendChild(div);
 }
 
-function addBackButton(){
+function addBackButton(displayDiv){
     const div = document.createElement('div');
     div.innerHTML = '<button id="back">Back</button>'
-    displayPlayers.appendChild(div);
+    displayDiv.appendChild(div);
 
     const back = document.getElementById('back');
 
     back.onclick = ()=>{
         displayPlayers.innerHTML= '';
         tournaments.style.display = 'inline';
+        displayLeaderBoard.innerHTML ='';
+    }
+}
+
+function addDeleteButton(){
+    const div = document.createElement('div');
+    div.innerHTML = '<button id="delete">Delete</button>'
+    displayPlayers.appendChild(div);
+
+    const del = document.getElementById('delete');
+
+    del.onclick = async()=>{
+        try {
+            await axios.delete(`/team/api/${teamId}`,{headers:{'Authorization':token}});
+            const team = document.getElementById(teamId)
+            team.parentNode.removeChild(team);
+            displayPlayers.innerHTML= '';
+            tournaments.style.display = 'inline';
+            displayLeaderBoard.innerHTML ='';
+        } catch (err) {
+            alert(err.response.data.message)
+        }
+       
     }
 }
 
@@ -157,9 +228,14 @@ function displayInputDiv(){
         const email = document.getElementById('playerEmail').value;
         const password = document.getElementById('playerPassword').value;
         if(email && password){
-            const playerData = await axios.post('/team/api/addPlayer',{email,password,teamId} ,{headers:{'Authorization':token}});
-            const player = playerData.data.player;
-            showPlayers(player.id ,player.name)
+            try {
+                
+                const playerData = await axios.post('/team/api/addPlayer',{email,password,teamId} ,{headers:{'Authorization':token}});
+                const player = playerData.data.player;
+                showPlayers(player.id ,player.name);
+            } catch (error) {
+                alert(err.response.data.message)
+            }
         }else{
             alert('please fill all fields!')
         }

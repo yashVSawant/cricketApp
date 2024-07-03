@@ -26,11 +26,11 @@ signup.addEventListener('click',async()=>{
         try {
             const playerType = selectType.id;
             console.log(name ,email  ,password ,playerType);
-            await axios.post(`${host}/user/api/signup`,{name ,email  ,password ,playerType});
+            await axios.post('/user/api/signup',{name ,email  ,password ,playerType});
             alert('signup successfull!');
             displayLogin();
-        } catch (error) {
-            alert('someting went wrong');
+        } catch (err) {
+            alert(err.response.data.message);
         }
         
     }else{
@@ -44,13 +44,12 @@ login.addEventListener('click',async()=>{
     if(email ,password){
         try {
             console.log(email ,password);
-            const data = await axios.post(`${host}/user/api/login`,{email  ,password });
+            const data = await axios.post('/user/api/login',{email  ,password });
             console.log(data.data);
             localStorage.setItem('token',`bearer ${data.data.token}`);
             window.location.href = '../home/index.html';
-        } catch (error) {
-            console.log(error)
-            alert('something went wrong');
+        } catch (err) {
+            alert(err.response.data.message);
         }
         
     }

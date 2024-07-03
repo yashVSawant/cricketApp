@@ -61,6 +61,22 @@ exports.postTeam = async(req,res)=>{
         res.status(500).json({success:false});
     }
 }
+exports.deleteTeam = async(req,res)=>{
+    try{
+        const {id} = req.params;
+        const getTeam = await team.findByPk(id);
+        console.log(getTeam.email != req.user.email)
+        if(getTeam.email === req.user.email){
+            await team.destroy({where:{id:id}});
+            res.status(200).json({success:true});
+        }else{
+            res.status(403).json({success:true});
+        }
+    }catch(err){
+        console.log(err)
+        res.status(500).json({success:false});
+    }
+}
 
 exports.addPlayer = async(req,res)=>{
     try {
@@ -71,6 +87,7 @@ exports.addPlayer = async(req,res)=>{
         if(getTeam.email === req.user.email){
             if(getTeamCount < 11){
                 const getUser = await user.findOne({where:{email:email}});
+                // console.log('getUser',getUser)
                 if(getUser){
                     await hash.compareHash(password , getUser.password);
                     await teamList.create({

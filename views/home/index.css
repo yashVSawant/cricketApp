@@ -8,7 +8,13 @@ body {
     justify-content: stretch;
     /* background-color: rgb(209, 141, 141);  */
 }
-
+#main{
+    width: 90%;
+}
+#displayLeaderBoard{
+    display: flex;
+    flex-direction: row;
+}
 #container{
     display: flex;
     flex-direction: row;
@@ -22,6 +28,12 @@ body {
     flex-direction: column;
     width: 300px;
     height: 100%;
+}
+#batter{
+width: 50%;
+}
+#bowler{
+    width: 50%;
 }
 .teamDiv{
     display: flex;
@@ -45,6 +57,15 @@ body {
     height: 18px;
     border-radius: 20%;
     background-color: rgb(247, 150, 111);
+}
+.leaderboard{
+    display: flex;
+    flex-direction: row;
+    margin: 1px;
+    background-color: rgb(202, 247, 166);
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
 }
 button{
     height: 40px;

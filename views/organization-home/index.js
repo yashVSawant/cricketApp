@@ -57,10 +57,51 @@ function displayTournaments(id , name , startDate , endDate , location){
     showTournaments.appendChild(div);
 }
 
-showTournaments.addEventListener('click',(e)=>{
+showTournaments.addEventListener('click',async(e)=>{
     if(e.target.classList.value === 'start'){
-        console.log(e.target.parentNode.id)
-        localStorage.setItem('tournamentId',(e.target.parentNode.id));
-        window.location.href='../select-team/index.html';
-    }
+            try{
+                // console.log(token);
+                const response = await axios.get('/match/api/payment',{headers:{'Authorization':token}});
+                // console.log(response);
+                const id = e.target.parentNode.id;
+                const orderId = response.data.Order.id
+                const options ={
+                    'key':response.data.key_id,
+                    'order_id':response.data.Order.id,
+                    'handler':async function (response){
+                        await axios.put('/match/api/payment',{
+                            order_id:options.order_id,
+                            payment_id:response.razorpay_payment_id,
+                            status:'SUCCESS'
+                        },{headers:{'Authorization':token}})
+                        
+                        alert('transaction successfull !')
+                        localStorage.setItem('tournamentId',id);
+                        localStorage.setItem('orderId',orderId);
+                        window.location.href='../select-team/index.html';
+                    }
+                }
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+                e.preventDefault();
+        
+                rzp1.on('payment.failed',async function (response){
+                    // console.log(response);
+                    await axios.put('/match/api/payment/',{
+                        order_id:options.order_id,
+                        payment_id:'null',
+                        status:'FAILD'
+                    },{headers:{'Authorization':token}})
+                    alert('transaction failed !')
+                })
+            }catch(err){
+                console.log(err)
+                alert('error')
+            }
+            
+        }
+        
 })
+
+        
+    

@@ -9,14 +9,14 @@ const authenticate = async(req,res,next)=>{
         if(!fullToken) throw new Error('access denied')
         const token = fullToken.split(" ")[1];
         const tokenClient = jwt.verify(token , process.env.TOKENKEY);
-        console.log(tokenClient.role)
+        
         if(tokenClient.role === 'organizer'){
             const client = await organization.findByPk(tokenClient.id);
-            if(!client){
+            if(client){
             req.user = client;
             next();
             }else{
-                res.status(403).json({success:false , message:"Unauthorize user"});
+                res.status(403).json({success:false , message:"Unauthorize organization"});
             }
         }else{
             res.status(403).json({success:false , message:'invalid token'});

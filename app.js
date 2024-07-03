@@ -24,6 +24,7 @@ const  tournament = require('./models/tournament');
 const  match = require('./models/match');
 const  team = require('./models/team');
 const  teamList = require('./models/teamList');
+const order = require('./models/order');
 
 userData.belongsTo(user);
 user.hasOne(userData);
@@ -39,6 +40,8 @@ tournament.belongsTo(organization);
 organization.hasMany(tournament);
 match.belongsTo(tournament);
 tournament.hasMany(match);
+order.belongsTo(organization);
+organization.hasMany(order);
 team.belongsToMany(user,{ through: teamList });
 user.belongsToMany(team,{ through: teamList });
 
@@ -74,9 +77,10 @@ sequelize
     io.on('connect',(socket)=>{
         socket.on('watch-score',(matchId)=>{
             socket.join(matchId);
-            // console.log(matchId)
+            console.log('joind >>',matchId)
         })
         socket.on('batter-update',( id ,inning,runs ,sixes ,fours ,balls,matchId)=>{
+            console.log(">",matchId)
             socket.to(matchId).emit('batter' , id ,inning,runs ,sixes ,fours ,balls);
         }) 
         socket.on('batter-out',( id ,inning,vaue,type,matchId)=>{
@@ -88,7 +92,8 @@ sequelize
         socket.on('bowler-wicket',( id,inning,wickets ,matchId)=>{
             socket.to(matchId).emit('wicket' ,id ,inning,wickets);
         })
-        socket.on('score',( inning ,value,type,matchId)=>{
+        socket.on('score',( inning ,value,type,overs,balls,matchId)=>{
+            console.log(inning ,value,type,overs,balls,matchId)
             socket.to(matchId).emit('get-score' ,inning ,value,type,overs ,balls);
         })
         socket.on('new-batter',(  id,inning,matchId)=>{

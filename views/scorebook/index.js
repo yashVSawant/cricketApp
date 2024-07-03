@@ -145,8 +145,9 @@ add.onclick = ()=>{
                 displayBatterStats();
                 updateCurrentOver();
                 updateScore();
-                displayRuns();
                 isValidBall();
+                displayRuns();
+                
                 displayOver();
                 displayWickets();
                 updateBowlerStats();
@@ -417,13 +418,14 @@ function updateScore(){
 function displayRuns(){
     const showRuns = document.getElementById(`runs${inning}`);
     showRuns.innerText = runs;
-    socket.emit('score',inning,runs ,'runs', tournamentId,overs ,balls,);
+    socket.emit('score',inning,runs ,'runs',overs ,balls,tournamentId);
+
 }
 function displayWickets(){
     if(extra==='WICKET!'){
         const showWickets = document.getElementById(`wickets${inning}`);
         showWickets.innerText = wickets;
-        socket.emit('score',inning,wickets ,'wickets', tournamentId,overs ,balls);
+        socket.emit('score',inning,wickets ,'wickets',overs ,balls ,tournamentId);
         whichBatter();
     }
 }

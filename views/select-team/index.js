@@ -35,7 +35,8 @@ start.onclick = async()=>{
                 console.log(team1Id ,team2Id)
             }
             const overs = matchOvers;
-            const postMatch = await axios.post('/match/api/postMatch',{team1Id ,team2Id,tournamentId,overs},{headers:{'Authorization':token}});
+            const orderId = localStorage.getItem('orderId');
+            const postMatch = await axios.post('/match/api/postMatch',{team1Id ,team2Id,tournamentId,overs,orderId},{headers:{'Authorization':token}});
             
             localStorage.setItem('matchId',(postMatch.data.match.id))
             if(battingFirst === 'team2'){
@@ -48,7 +49,7 @@ start.onclick = async()=>{
             location.href = '/scoreBook/index.html';
         }
     } catch (err) {
-        alert('something went wrong!');
+        alert(err.response.data.message);
     }
 }
 
@@ -65,7 +66,7 @@ findTeam1.onclick = async()=>{
         
     } catch (err) {
         console.log(err)
-        alert('something went wrong!');
+        alert(err.response.data.message);
     }
     
 }
@@ -80,7 +81,7 @@ findTeam2.onclick = async()=>{
         
     } catch (err) {
         console.log(err)
-        alert('something went wrong!');
+        alert(err.response.data.message);
     }
 }
 

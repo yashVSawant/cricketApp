@@ -12,6 +12,9 @@ routes.get('/getMatch/:id',userAuthentication.authenticate,controller.getMatch);
 routes.put('/:id/update',organizationAuthentication.authenticate,controller.updateMatch);
 routes.put('/:id/endMatch',organizationAuthentication.authenticate,controller.endMatch);
 
+routes.get('/payment',organizationAuthentication.authenticate,controller.purchasePremium);
+routes.put('/payment',organizationAuthentication.authenticate,controller.updatePremium);
+
 routes.post('/:id/batter/updates',organizationAuthentication.authenticate,controller.postBatterUpdate);
 routes.put('/:id/batter/updates',organizationAuthentication.authenticate,controller.updateBatterUpdate);
 routes.get('/:id/batter/updates',userAuthentication.authenticate,controller.getBatterUpdate);
