@@ -7,7 +7,7 @@ const team = sequelize.define('team',{
         type:Sequelize.STRING,
         allowNull:false,
     },
-    email:{
+    captainName:{
         type:Sequelize.STRING,
         unique:true,
         allowNull:false

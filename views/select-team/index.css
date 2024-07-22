@@ -13,6 +13,8 @@
     align-items: center;
     height: 40px;
     background-color: rgb(236, 192, 135);
+    border-radius: 10px;
+    padding-inline-start: 5px;
 }
 .findPlayerDiv{
     display: flex;

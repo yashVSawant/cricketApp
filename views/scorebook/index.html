@@ -14,18 +14,19 @@
                 <div class="score">
                     <h3 id="runs1">0</h3> - <h3 id="wickets1">0</h3>
                 </div>
-                <div class="over"><a class="over">(<h4 id="over1">0</h4>.<h4 id="balls1">0</h4>/<h4 id="oversMatch1">0</h4>)</a></div>
+                
             </div>
+            <div class="over"><a class="over">(<h4 id="over1">0</h4>.<h4 id="balls1">0</h4>/<h4 id="oversMatch1">0</h4>)</a></div>
+            <button id="show">0</button>
             <div id="secondInnings">
                 <h3 id="team2Name">name</h3>
                 <div class="score">
                     <h3 id="runs2">0</h3> - <h3 id="wickets2">0</h3>
                 </div>
-                <div class="over"><a class="over">(<h4 id="over2">0</h4>.<h4 id="balls2">0</h4>/<h4 id="oversMatch2">0</h4>)</a></div>
             </div>
+            <div class="over"><a class="over">(<h4 id="over2">0</h4>.<h4 id="balls2">0</h4>/<h4 id="oversMatch2">0</h4>)</a></div>
         </div>
         
-        <hr>
         <div>
             <div id="updateButtons">
                 <button id="oneRun">+1</button>
@@ -36,7 +37,6 @@
                 <button id="byes">byes!</button>
                 <button id="diclaire">diclare!</button>
                 <button id="wicketButton">WICKET!</button>
-                <button id="show">0</button>
                 <button id="add">add</button>
                 <button id="cancle">cancle</button>
                 <button id="changeStrike">stike !</button>
@@ -71,12 +71,8 @@
                     </table>
                     
                 </div>
-                <!-- <div>
-                    <input type="text" id="newBatterName">
-                    <button id="addBatter">Add Batter</button>
-                </div> -->
                 <hr>
-                <div id="ballerStats1">
+                <div id="ballerStats1" class="bowlerStats">
                     <table id="ballersTable1">
                         <tr>
                             <th>name</th>
@@ -109,7 +105,7 @@
                     
                 </div>
                 <hr>
-                <div id="ballerStats2">
+                <div id="ballerStats2" class="bowlerStats">
                     <table id="ballersTable2">
                         <tr>
                             <th>name</th>

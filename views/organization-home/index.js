@@ -61,7 +61,7 @@ showTournaments.addEventListener('click',async(e)=>{
     if(e.target.classList.value === 'start'){
             try{
                 // console.log(token);
-                const response = await axios.get('/match/api/payment',{headers:{'Authorization':token}});
+                const response = await axios.get('/payment/api/',{headers:{'Authorization':token}});
                 // console.log(response);
                 const id = e.target.parentNode.id;
                 const orderId = response.data.Order.id
@@ -69,7 +69,7 @@ showTournaments.addEventListener('click',async(e)=>{
                     'key':response.data.key_id,
                     'order_id':response.data.Order.id,
                     'handler':async function (response){
-                        await axios.put('/match/api/payment',{
+                        await axios.put('/payment/api/',{
                             order_id:options.order_id,
                             payment_id:response.razorpay_payment_id,
                             status:'SUCCESS'
@@ -87,7 +87,7 @@ showTournaments.addEventListener('click',async(e)=>{
         
                 rzp1.on('payment.failed',async function (response){
                     // console.log(response);
-                    await axios.put('/match/api/payment/',{
+                    await axios.put('/payment/api/',{
                         order_id:options.order_id,
                         payment_id:'null',
                         status:'FAILD'
@@ -96,7 +96,7 @@ showTournaments.addEventListener('click',async(e)=>{
                 })
             }catch(err){
                 console.log(err)
-                alert('error')
+                alert(err.response.data.message)
             }
             
         }

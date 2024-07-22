@@ -1,17 +1,15 @@
 
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const sequelize = require('../utils/database');
 const { Op } = require('sequelize');
 
 const user = require('../models/user');
 const userData = require('../models/userData');
 const batterLiveData = require('../models/batterLiveData');
 const bowlerLiveData = require('../models/bowlerLiveData');
-const hashService = require('../services/bcrypt');
+const ApiError = require('../utils/ApiErrors');
+
 const s3Services = require('../services/s3Services');
 
-exports.batterLeaderboard = async(req,res)=>{
+exports.batterLeaderboard = async(req,res,next)=>{
     try {
         const top5 = await userData.findAll({
             attributes: ['runs'],
@@ -27,11 +25,10 @@ exports.batterLeaderboard = async(req,res)=>{
           });
         res.status(200).json({succcess:true ,top5});
     }catch(err){
-        console.log(err)
-        res.status(500).json({success:false ,message:err.message})
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
-exports.bowlerLeaderboard = async(req,res)=>{
+exports.bowlerLeaderboard = async(req,res,next)=>{
     try {
         const top5 = await userData.findAll({
             attributes: ['wickets'],
@@ -47,27 +44,27 @@ exports.bowlerLeaderboard = async(req,res)=>{
           });
         res.status(200).json({succcess:true ,top5});
     }catch(err){
-        console.log(err)
-        res.status(500).json({success:false ,message:err.message})
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.getUserData =async(req,res)=>{
+exports.getUserData =async(req,res,next)=>{
     try{
         const data = await userData.findOne({
             where:{userId:req.user.id}
         });
         res.status(200).json({succcess:true ,data ,name:req.user.name});
     }catch(err){
-        res.status(404).json({success:false ,message:err.message})
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.updateBattingData =async(req,res)=>{
+exports.updateBattingData =async(req,res,next)=>{
     try{
         const {id} = req.body;
+        if(isNullValue(id))throw new ApiError('invalid input!' ,400)
         const getLiveData = await batterLiveData.findOne({where:{userId:id}});
-        if(getLiveData){
+        if(!getLiveData)throw new ApiError('user is not playing currently!',400)
             const data = await userData.findOne({
                 where:{userId:id}
             });
@@ -81,18 +78,16 @@ exports.updateBattingData =async(req,res)=>{
                 highestScore:highestScore
             })
             res.status(200).json({succcess:true });
-        }else{
-            throw new Error('user is not playing currently!')
-        }
     }catch(err){
-        res.status(500).json({success:false ,message:err.message})
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
-exports.updateBowlingData =async(req,res)=>{
+exports.updateBowlingData =async(req,res,next)=>{
     try{
         const {id} = req.body;
+        if(isNullValue(id))throw new ApiError('invalid input!' ,400)
         const getLiveData = await bowlerLiveData.findOne({where:{userId:id}});
-        if(getLiveData){
+        if(!getLiveData)throw new ApiError('user is not playing currently!',400)
             const data = await userData.findOne({
                 where:{userId:id}
             });
@@ -104,83 +99,26 @@ exports.updateBowlingData =async(req,res)=>{
                 highestWickets: highestWickets
             })
             res.status(200).json({succcess:true });
-        }else{
-            throw new Error('user is not playing currently!')
-        }
     }catch(err){
-        res.status(500).json({success:false ,message:err.message})
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 exports.postPhoto = async(req,res,next)=>{
     try{
         const {id} = req.user;
         const getfile = req.file;
-        // console.log(getfile)
-        const filename = `profilePhoto/${id}.jpg`;
+        if(isNullValue(id))throw new ApiError('invalid input!' ,400)
+        const filename = `profilePhotos/${id}.jpg`;
         const imageUrl = await s3Services.uploadToS3(getfile,filename);
         // console.log(fileUrl);
         await userData.update({imageUrl:imageUrl},{where:{userId:id}});
         res.status(201).json({success:true,imageUrl:imageUrl});
     }catch(err){
-        console.log(err)
-        res.status(500).json({success:false})
+        next(new ApiError(err.message ,err.statusCode))
     }
    
 }
 
-exports.signup = async(req,res)=>{
-    const transaction = await sequelize.transaction();
-    try{
-        const {name , email  , password ,playerType} = req.body;
-        if(isNullValue(name) || isNullValue(email) || isNullValue(password) ||isNullValue(playerType)){
-            throw new Error("invalid input!");
-        }
-
-        const hash = await hashService.createHash(password);
-        const newUser = await user.create({
-                        name,
-                        email,
-                        password:hash
-        },{transaction})
-        await userData.create({
-                userId:newUser.id,
-                playerType:playerType
-        },{transaction})
-        res.status(201).json({success:true});
-        await transaction.commit();
-            
-    }catch(err){
-        console.log(err);
-        await transaction.rollback();
-        res.status(500).json({message:err.message});
-    }
-    
-}
-
-exports.login = async(req,res)=>{
-    try{
-        const {email , password} = req.body;
-        if(isNullValue(email) || isNullValue(password)){
-            throw new Error("invalid input!");
-        }
-
-        let checkUser = await user.findOne({where:{email:email}});
-        if(checkUser){
-            await hashService.compareHash(password ,checkUser.password);
-            res.status(200).json({success:true , token:generateAccessToken(checkUser.id,checkUser.name)});      
-        }else{
-            res.status(404).json({success:false,message:"user not found"})
-        }
-    }catch(err){
-        console.log(err)
-        res.status(500).json({success:false,message:err.message})
-    }
-}
-
 function isNullValue(value){
     return value === ""?true :false;
-}
-
-function generateAccessToken(id, name ){
-    return jwt.sign({id,name,role:'player'},process.env.TOKENKEY);
 }

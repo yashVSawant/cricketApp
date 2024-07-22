@@ -18,7 +18,6 @@ const uploadToS3 = (data , filename)=>{
             s3bucket.upload(param ,(err,s3response)=>{
                 if(err){
                     // console.log(param)
-                    console.log("somthing went wrong ",err)
                     reject(err)
                 }else{
                     // console.log('success');

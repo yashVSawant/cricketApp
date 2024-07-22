@@ -15,12 +15,10 @@ const token = localStorage.getItem('token');
 window.addEventListener('DOMContentLoaded',async()=>{
     try {
         const info = await axios.get('/tournament/api/ongonigTournaments',{headers:{'Authorization':token}});
-        console.log(info.data.info)
         info.data.info.forEach((t)=>{
             displayTournaments(t.id , t.name ,t.startDate ,t.endDate ,t.address);
         });
         const data = await axios.get('/team/api/',{headers:{'Authorization':token}});
-        console.log(data.data)
         data.data.team.forEach((t)=>{
             displayTeam(t.id ,t.name);
         });
@@ -37,7 +35,11 @@ profile.onclick = async()=>{
 }
 createTeam.onclick = ()=>{
     const createTeamDiv = document.getElementById('createTeamDiv');
-    createTeamDiv.style.display = 'inline'
+    if(createTeamDiv.style.display === "inline"){
+        createTeamDiv.style.display = 'none'
+    }else{
+        createTeamDiv.style.display = 'inline'
+    }
 }
 
 create.onclick = async()=>{
@@ -80,13 +82,18 @@ showTeam.addEventListener('click',async(e)=>{
             const data = await axios.get(`/team/api/${id}/players`,{headers:{'Authorization':token}});
             tournaments.style.display = 'none';
             displayLeaderBoard.innerHTML= '';
-            // displayPlayers.style.display = 'inline'
             displayPlayers.innerHTML= '';
             addBackButton(displayPlayers);
-            addDeleteButton()
-            displayInputDiv();
+            
+
+            const isCaptain = data.data.isCaptain;
+            console.log(isCaptain)
+            if(isCaptain){
+                addDeleteButton()
+                displayInputDiv();     
+            }
             data.data.players.forEach((p)=>{
-                showPlayers(p.id ,p.name);
+                showPlayers(p.id ,p.name,isCaptain);
             })
             teamId = e.target.parentNode.id;
         } catch (err) {
@@ -167,12 +174,13 @@ function displayTeam(id ,name){
     showTeam.appendChild(div);
 }
 
-function showPlayers(id ,name){
-    
+function showPlayers(id ,name ,isCaptain){
+
+    const removeButton = isCaptain ?'<button class="remove">remove</button>':'';
     const div = document.createElement('div');
     div.innerHTML = `<div id="${id}" class="playerDiv">
     <h4>${name}</h4>
-    <button class="remove">remove</button>
+    ${removeButton}
     </div>`;
     displayPlayers.appendChild(div);
 }
@@ -216,24 +224,24 @@ function addDeleteButton(){
 function displayInputDiv(){
     const div = document.createElement('div');
     div.innerHTML =`<div >
-                <label>player email:</label>
-                <input type="text" id="playerEmail">
-                <label>password:</label>
+                <label>Username:</label>
+                <input type="text" id="playerName">
+                <label>Password:</label>
                 <input type="password" id="playerPassword">
                 <button id="add">add</button>
             </div>`;
     displayPlayers.appendChild(div);
     const add = document.getElementById('add');
     add.onclick = async()=>{
-        const email = document.getElementById('playerEmail').value;
+        const name = document.getElementById('playerName').value;
         const password = document.getElementById('playerPassword').value;
-        if(email && password){
+        if(name && password){
             try {
                 
-                const playerData = await axios.post('/team/api/addPlayer',{email,password,teamId} ,{headers:{'Authorization':token}});
+                const playerData = await axios.post('/team/api/addPlayer',{name,password,teamId} ,{headers:{'Authorization':token}});
                 const player = playerData.data.player;
                 showPlayers(player.id ,player.name);
-            } catch (error) {
+            } catch (err) {
                 alert(err.response.data.message)
             }
         }else{

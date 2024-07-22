@@ -49,6 +49,7 @@ start.onclick = async()=>{
             location.href = '/scoreBook/index.html';
         }
     } catch (err) {
+        console.log(err)
         alert(err.response.data.message);
     }
 }
@@ -56,9 +57,9 @@ start.onclick = async()=>{
 
 findTeam1.onclick = async()=>{
     try {
-        const email = document.getElementById('team1Email').value;
+        const name = document.getElementById('team1Name').value;
         const password = document.getElementById('team1Password').value;
-        const teamData = await axios.post('/team/api/match/players',{email , password},{headers:{'Authorization':token}});
+        const teamData = await axios.post('/team/api/match/players',{name , password},{headers:{'Authorization':token}});
         // console.log(teamData.data.players)
         showTeamName(1,teamData.data.team.name);
         team1Id = teamData.data.team.id
@@ -72,9 +73,9 @@ findTeam1.onclick = async()=>{
 }
 findTeam2.onclick = async()=>{
     try {
-        const email = document.getElementById('team2Email').value;
+        const name = document.getElementById('team2Name').value;
         const password = document.getElementById('team2Password').value;
-        const teamData = await axios.post('/team/api/match/players',{email , password},{headers:{'Authorization':token}});
+        const teamData = await axios.post('/team/api/match/players',{name , password},{headers:{'Authorization':token}});
         showTeamName(2,teamData.data.team.name);
         team2Id = teamData.data.team.id
         showTeamDiv(teamData.data.players,2);
@@ -97,7 +98,7 @@ function showTeamDiv(team,teamNo){
     const main = document.getElementById(`main${teamNo}`);
     main.innerHTML = '';
     team.forEach(e => {
-        displayPlayer(teamNo ,e.id , e.name , e.email)
+        displayPlayer(teamNo ,e.id , e.name)
     });
     if(teamNo===1){
         team1 = team;
@@ -132,7 +133,7 @@ function displayPlayer(teamNo ,id ,name ,email){
     const div = document.createElement('div');
         div.id=id;
         div.innerHTML = `
-        <div class="playerDiv" id="${id}"><h4>${name}</h4> ( <h4>${email}</h4> )
+        <div class="playerDiv" id="${id}"><h4>${name}</h4>
         </div>
         `
     main.appendChild(div);

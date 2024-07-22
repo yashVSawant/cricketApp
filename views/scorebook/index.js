@@ -637,7 +637,7 @@ function completeWicketProcess(id,button ,bId){
 
 function highLightStrikeBatter(id1,id2){
     const strikeDiv = document.getElementById(`${id1}`);
-    strikeDiv.style.backgroundColor = 'yellow';
+    strikeDiv.style.backgroundColor = 'blue';
 
     const nonStrike = document.getElementById(`${id2}`);
     nonStrike.style.backgroundColor = 'white';

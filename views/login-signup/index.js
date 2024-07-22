@@ -6,7 +6,6 @@ const loginDiv = document.getElementById("loginDiv");
 
 const signup = document.getElementById("signup");
 const login = document.getElementById("login");
-const host = 'http://localhost:3333';
 
 loginPage.addEventListener('click',()=>{
     displayLogin();
@@ -19,14 +18,14 @@ signupPage.addEventListener('click',()=>{
 signup.addEventListener('click',async()=>{
     
     const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
+    // const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const selectType = document.querySelector('input[name="playerType"]:checked');
-    if(name ,email  ,password ,selectType){
+    if(name   ,password ,selectType){
         try {
             const playerType = selectType.id;
-            console.log(name ,email  ,password ,playerType);
-            await axios.post('/user/api/signup',{name ,email  ,password ,playerType});
+            console.log(name   ,password ,playerType);
+            await axios.post('/auth/api/signup',{name  ,password ,playerType});
             alert('signup successfull!');
             displayLogin();
         } catch (err) {
@@ -39,15 +38,16 @@ signup.addEventListener('click',async()=>{
 })
 
 login.addEventListener('click',async()=>{
-    const email = document.getElementById('LoginEmail').value;
+    const name = document.getElementById('LoginUsername').value;
     const password = document.getElementById('LoginPassword').value;
-    if(email ,password){
+    if(name ,password){
         try {
-            console.log(email ,password);
-            const data = await axios.post('/user/api/login',{email  ,password });
+            console.log(name ,password);
+            const data = await axios.post('/auth/api/login',{name  ,password });
             console.log(data.data);
+            const link = data.data.link;
             localStorage.setItem('token',`bearer ${data.data.token}`);
-            window.location.href = '../home/index.html';
+            window.location.href = link;
         } catch (err) {
             alert(err.response.data.message);
         }

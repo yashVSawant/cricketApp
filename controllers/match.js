@@ -1,113 +1,137 @@
 const sequelize = require('../utils/database');
-const Razorpay = require('razorpay');
 const match = require('../models/match');
 const batterLiveData = require('../models/batterLiveData');
 const bowlerLiveData = require('../models/bowlerLiveData');
 const userData = require('../models/userData');
-const team = require('../models/team');
+const tournament = require('../models/tournament');
 const teamList = require('../models/teamList');
 const order = require('../models/order');
+const { Op } = require('sequelize');
 require('dotenv').config();
+const ApiError = require('../utils/ApiErrors');
 
 
-exports.getBowlerUpdate = async(req,res)=>{
+exports.getBowlerUpdate = async(req,res,next)=>{
     try {
         const {id } = req.params;
+        if(isNullValue(id))throw ApiError('invalid input!',400)
         const bowler = await bowlerLiveData.findAll({where:{matchId:id}});
         res.status(200).json({success:true,bowler});
     } catch (err) {
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.updateBowlerUpdate = async(req,res)=>{
+exports.updateBowlerUpdate = async(req,res,next)=>{
     try {
         const {userId ,runs ,overs} = req.body;
         const {id} = req.params;
-        console.log('over',overs)
+        if(isNullValue(id) || isNullValue(userId) || isNullValue(runs) || isNullValue(overs))throw ApiError('invalid input!',400)
         const batter = await bowlerLiveData.findOne({where:{userId:userId,matchId:id}});
         batter.update({
             runs ,overs:overs 
         })
         res.status(201).json({success:true});
     } catch (err) {
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
-exports.updateBowlerWicket = async(req,res)=>{
+exports.updateBowlerWicket = async(req,res,next)=>{
     try {
         const {userId ,wickets} = req.body;
         const {id} = req.params;
+        if(isNullValue(id)|| isNullValue(userId) || isNullValue(wickets))throw ApiError('invalid input!',400)
         const batter = await bowlerLiveData.findOne({where:{userId:userId,matchId:id}});
         batter.update({
             wickets 
         })
         res.status(201).json({success:true});
     } catch (err) {
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.postBowlerUpdate = async(req,res)=>{
+exports.postBowlerUpdate = async(req,res,next)=>{
     try {
         const {userId} = req.body;
-        const {id}= req.params;    
+        const {id}= req.params;  
+        if(isNullValue(id)|| isNullValue(userId))throw ApiError('invalid input!',400)  
         await bowlerLiveData.create({
             userId:userId,
             matchId:id
         })
         res.status(201).json({success:true});
     } catch (err) {
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
 // hhh
-exports.getBatterUpdate = async(req,res)=>{
+exports.getBatterUpdate = async(req,res,next)=>{
     try {
         const {id } = req.params;
+        if(isNullValue(id))throw ApiError('invalid input!',400)
         const batters = await batterLiveData.findAll({where:{matchId:id}});
         res.status(200).json({success:true,batters});
     } catch (err) {
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.updateBatterUpdate = async(req,res)=>{
+exports.updateBatterUpdate = async(req,res,next)=>{
     try {
         const {userId ,runs ,fours ,sixes ,balls,state} = req.body;
         const {id}= req.params; 
+        if(isNullValue(id)|| isNullValue(userId) || isNullValue(runs)||isNullValue(fours)||isNullValue(sixes)||isNullValue(balls)||isNullValue(state))throw ApiError('invalid input!',400)
         const batter = await batterLiveData.findOne({where:{userId:userId,matchId:id}});
         batter.update({
             state ,runs ,fours ,sixes ,balls
         })
         res.status(201).json({success:true});
     } catch (err) {
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.postBatterUpdate = async(req,res)=>{
+exports.postBatterUpdate = async(req,res,next)=>{
     try {
         const {userId} = req.body;
         const {id} = req.params;
+        if(isNullValue(id)||isNullValue(userId))throw ApiError('invalid input!',400)
         await batterLiveData.create({
             userId:userId,
             matchId:id
         })
         res.status(201).json({success:true});
     } catch (err) {
-        console.log(err)
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.postMatch = async(req,res)=>{
+exports.postMatch = async(req,res,next)=>{
     const transaction = await sequelize.transaction();
     try {
         const {team1Id ,team2Id,tournamentId,overs,orderId} = req.body;
+        if(isNullValue(team1Id)||isNullValue(team2Id)||isNullValue(tournamentId)||isNullValue(overs)||isNullValue(orderId))throw ApiError('invalid input!',400)
         const getOrder = await order.findOne({where:{orderId:orderId ,isValid:true}});
-        if(getOrder){
+        if(!getOrder)throw new ApiError('order not valid',400);
+        
+        let day = new Date();
+        day.setHours(0,0,0,0);
+        let today = new Date(day);
+        const getTournament = await tournament.findOne({
+            where: {
+                id:tournamentId,
+                startDate: {
+                [Op.lte]: new Date()
+                },
+                endDate: {
+                    [Op.gte]: today
+                }
+            },
+            
+        },{transaction})
+        if(!getTournament)throw new ApiError('tournament has not started yet!',400)
             const createMatch = await match.create({
                 team1Id,
                 team2Id,
@@ -130,60 +154,53 @@ exports.postMatch = async(req,res)=>{
             );
             await transaction.commit();
             res.status(201).json({success:true,match:createMatch});
-        }else{
-            res.status(403).json({success:true,message:'order not valid'});
-        }
+        
         
     } catch (err) {
         await transaction.rollback();
-        console.log(err)
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
-exports.updateMatch = async(req,res)=>{
+exports.updateMatch = async(req,res,next)=>{
     try {
         const {inning,runs,wickets,overs,balls} = req.body;
         const {id} = req.params;
-        // console.log(inning,runs,wickets,overs,balls,id)
+        if(isNullValue(id)||isNullValue(inning)||isNullValue(runs)||isNullValue(wickets)||isNullValue(overs)||isNullValue(balls))throw ApiError('invalid input!',400)
         const getMatch = await match.findByPk(id);
-        if(getMatch){
-            if(inning === 1){
-                getMatch.update({
-                    team1Runs:runs ,team1Wickets:wickets ,team1Overs:overs,team1Balls:balls
-                });
-            }else{
-                getMatch.update({
-                    team2Runs:runs ,team2Wickets:wickets,team2Overs:overs,team2Balls:balls
-                });
-            }
-            res.status(201).json({success:true});
+        if(!getMatch)throw new ApiError('match not found!',404);
+        if(inning === 1){
+            getMatch.update({
+                team1Runs:runs ,team1Wickets:wickets ,team1Overs:overs,team1Balls:balls
+            });
         }else{
-            res.status(404).json({success:false,message:'match not found!'});
+            getMatch.update({
+                team2Runs:runs ,team2Wickets:wickets,team2Overs:overs,team2Balls:balls
+            });
         }
-        
+        res.status(201).json({success:true});    
         
     } catch (err) {
-        console.log(err)
-        res.status(500).json({success:false,message:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.getMatch = async(req ,res)=>{
+exports.getMatch = async(req ,res ,next)=>{
     try {
         const {id } = req.params;
+        if(isNullValue(id))throw ApiError('invalid input!',400)
         const getMatch = await match.findOne({where:{tournamentId:id,isLive:true}});
-        // console.log(getMatch)
         res.status(201).json({success:true,match:getMatch});
     } catch (err) {
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.endMatch = async(req,res)=>{
+exports.endMatch = async(req,res,next)=>{
     const transaction = await sequelize.transaction();
     try {
         const {id} = req.params;
         const {orderId} = req.body;
+        if(isNullValue(id)||isNullValue(orderId))throw ApiError('invalid input!',400)
         await order.update({isValid:false},{where:{orderId:orderId}},{transaction});
         await match.update({isLive:false},{where:{id:id}},{transaction});
         const getBattersData = await batterLiveData.findAll({where:{matchId:id}},{transaction});
@@ -233,39 +250,10 @@ exports.endMatch = async(req,res)=>{
         
     } catch (err) {
         await transaction.rollback();
-        res.status(500).json({success:false,err:err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.purchasePremium = async (req,res)=>{
-    try{
-        var rzp = new Razorpay({
-            key_id:process.env.RAZORPAY_KEY_ID,
-            key_secret:process.env.RAZORPAY_KEY_SECRET
-        })
-        const amount = 5000;
-        rzp.orders.create({amount,currency:'INR'},async(err ,Order)=>{
-                if(err){
-                    console.log(err)
-                    throw new Error(JSON.stringify(err))
-                }
-                await order.create({orderId:Order.id ,organizationId:req.user.id})
-                return res.status(201).json({Order ,key_id : rzp.key_id});
-            })      
-        
-    }catch(err){
-        console.log(err)
-        res.status(400).json({success:false,message:'something went wrong in purchase!'})
-    }
-}
-exports.updatePremium = async(req,res)=>{
-    try{
-        
-        const {order_id,payment_id,status} = req.body;
-        await order.update({status:status,paymentId:payment_id},{where:{orderId:order_id}})
-        res.status(200).json({success:true})
-    }catch(err){
-        console.log(err)
-        res.status(500).json({success:false,message:'something went wrong in updatePremium!'})
-    }
+function isNullValue(value){
+    return value === ""?true :false;
 }

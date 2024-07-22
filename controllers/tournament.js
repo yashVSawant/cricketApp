@@ -1,61 +1,75 @@
 const tournament = require('../models/tournament');
-const organization = require('../models/organization');
+const user = require('../models/user');
 const match = require('../models/match');
 const { Op } = require('sequelize');
 const hashService = require('../services/bcrypt');
+const ApiError = require('../utils/ApiErrors');
 
-exports.ongoingTournaments = async(req,res)=>{
+exports.ongoingTournaments = async(req,res,next)=>{
     try {
-        let today = new Date();
+        let day = new Date();
+        day.setHours(0,0,0,0);
+        let today = new Date(day);
         const info = await tournament.findAll({
             where: {
                 startDate: {
-                    [Op.lte]: today
+                    [Op.lte]: new Date()
                 },
                 endDate: {
                     [Op.gte]: today
                 }
             },
             include: [{
-                model: organization,
+                model: user,
                 attributes: ['name']
             }]
         })
         res.status(200).json({success:true , info});
     }catch (err) {
-        console.log(err)
-        res.status(500).json({success:false,message: err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
-exports.postTournament = async(req,res)=>{
+exports.postTournament = async(req,res,next)=>{
     try {
         const {name , startDate , endDate ,address,password }  = req.body;
-        await hashService.compareHash(password,req.user.password);
-        const post = await tournament.create({
-                name,
-                startDate,
-                endDate,
-                address,
-                organizationId:req.user.id
-        })
-        res.status(201).json({success:true ,tournament:post});
+        if(isNullValue(name) || isNullValue(startDate)||isNullValue(endDate)||isNullValue(address)||isNullValue(password))throw new ApiError('invalid input!' ,400)
+        if((new Date(startDate)<new Date() || new Date(startDate) > new Date(endDate)))throw new ApiError('invalid dates!',400)
+            await hashService.compareHash(password,req.user.password);
+            const post = await tournament.create({
+                    name,
+                    startDate,
+                    endDate,
+                    address,
+                    userId:req.user.id
+            })
+            res.status(201).json({success:true ,tournament:post});
         
     } catch (err) {
-        console.log(err)
-        res.status(500).json({success:false,message: "Internal Server Error"});
+        next(new ApiError(err.message ,err.statusCode))
     }
     
 }
-exports.getTournaments = async(req,res)=>{
+exports.getTournaments = async(req,res,next)=>{
     try {
+        let day = new Date();
+        day.setHours(0,0,0,0);
+        let today = new Date(day);
         const tournaments = await tournament.findAll({
-            where: {organizationId:req.user.id},
+            where: {
+                userId:req.user.id,
+                endDate: {
+                    [Op.gte]: today
+                }
+            },
+            
         })
         res.status(200).json({success:true , tournaments});
     }catch (err) {
-        console.log(err)
-        res.status(500).json({success:false,message: err.message});
+        next(new ApiError(err.message ,err.statusCode))
     }
 }
 
+function isNullValue(value){
+    return value === ""?true :false;
+}

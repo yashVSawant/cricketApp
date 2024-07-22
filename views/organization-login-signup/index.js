@@ -30,7 +30,7 @@ signup.addEventListener('click',async()=>{
             alert('singup successfull !');
             displayLogin();
         } catch (error) {
-            alert('someting went wrong');
+            alert(error.response.data.message);
         }
         
     }else{
@@ -43,14 +43,11 @@ login.addEventListener('click',async()=>{
     const password = document.getElementById('LoginPassword').value;
     if(email ,password){
         try {
-            console.log(email ,password);
             const data = await axios.post(`${host}/organization/api/login`,{email  ,password });
-            console.log(data.data);
             localStorage.setItem('token',`bearer ${data.data.token}`);
             window.location.href = '../organization-home/index.html';
         } catch (error) {
-            console.log(error)
-            alert('something went wrong');
+            alert(error.response.data.message);
         }
         
     }

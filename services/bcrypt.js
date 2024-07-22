@@ -1,12 +1,13 @@
 const bcrypt = require('bcrypt');
 const salt = 10;
+const ApiError = require('../utils/ApiErrors')
 exports.createHash = (password)=>{
     return new Promise((res,rej) =>{
         bcrypt.hash(password ,salt ,async(err , hash)=>{
         if(!err){  
             res(hash);
         }else{
-            rej('something went wrong');
+            rej();
         }
     })})
 }
@@ -20,7 +21,7 @@ exports.compareHash = (password ,hash)=>{
             if(result){
                 res('success');
             }else{
-                rej("incorrect password !");
+                rej(new ApiError('incorrect password!',401));
             }
         })
         

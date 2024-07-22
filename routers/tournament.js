@@ -1,14 +1,13 @@
 const express = require('express');
 
+const {restrictTo}=require('../middlewares/authentication');
 const controller = require('../controllers/tournament');
-
-const userAuthentication = require('../middleware/userAuthentication');
-const organizationAuthentication = require('../middleware/organizationAuthentication');
 
 const routes = express.Router();
 
-routes.post('/',organizationAuthentication.authenticate,controller.postTournament);
-routes.get('/ongonigTournaments',userAuthentication.authenticate,controller.ongoingTournaments);
-routes.get('/',organizationAuthentication.authenticate,controller.getTournaments);
+routes.post('/',restrictTo(['organization']),controller.postTournament);
+routes.get('/',restrictTo(['organization']),controller.getTournaments);
+routes.get('/ongonigTournaments',restrictTo(['player']),controller.ongoingTournaments);
+
 
 module.exports = routes;

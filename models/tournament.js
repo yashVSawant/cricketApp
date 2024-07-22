@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 const sequelize = require('../utils/database');
-const { format } = require('mysql2');
+// const { format } = require('mysql2');
 
 const tournament = sequelize.define('tournament',{
     name:{

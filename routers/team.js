@@ -1,19 +1,17 @@
 const express = require('express');
 
 const controller = require('../controllers/team');
-
-const userAuthentication = require('../middleware/userAuthentication');
-const organizationAuthentication = require('../middleware/organizationAuthentication');
+const {restrictTo}=require('../middlewares/authentication');
 
 const routes = express.Router();
 
-routes.post('/match/players',organizationAuthentication.authenticate,controller.getPlayersAndTeam);
-routes.post('/',userAuthentication.authenticate,controller.postTeam);
-routes.get('/',userAuthentication.authenticate,controller.getTeam);
-routes.get('/:id/players',userAuthentication.authenticate,controller.getPlayers);
-routes.post('/addPlayer',userAuthentication.authenticate,controller.addPlayer);
-routes.delete('/:teamId/:id/remove',userAuthentication.authenticate,controller.removePlayer);
-routes.delete('/:id',userAuthentication.authenticate,controller.deleteTeam);
+routes.post('/match/players',restrictTo(['organization']),controller.getPlayersAndTeam);
+routes.post('/',restrictTo(['player']),controller.postTeam);
+routes.get('/',restrictTo(['player']),controller.getTeam);
+routes.get('/:id/players',restrictTo(['player']),controller.getPlayers);
+routes.post('/addPlayer',restrictTo(['player']),controller.addPlayer);
+routes.delete('/:teamId/:id/remove',restrictTo(['player']),controller.removePlayer);
+routes.delete('/:id',restrictTo(['player']),controller.deleteTeam);
 
 
 module.exports = routes;

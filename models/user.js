@@ -5,10 +5,6 @@ const sequelize = require('../utils/database');
 const user = sequelize.define('user',{
     name :{
         type:Sequelize.STRING,
-        allowNull:false
-    },
-    email:{
-        type:Sequelize.STRING,
         allowNull:false,
         unique:true
     },
@@ -20,6 +16,11 @@ const user = sequelize.define('user',{
         type:Sequelize.BOOLEAN,
         allowNull:false,
         defaultValue:false
+    },
+    role:{
+        type:Sequelize.STRING,
+        allowNull:false,
+        defaultValue:'player'
     }
 })
 

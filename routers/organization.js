@@ -1,11 +1,14 @@
 const express = require('express');
 
-const controller = require('../controllers/organization');
+const {restrictTo} = require('../middlewares/authentication');
+
+const controller = require('../controllers/organizer');
 
 const routes = express.Router();
 
-routes.post('/signup',controller.signup);
-routes.post('/login',controller.login);
+routes.post('/',restrictTo(['admin']),controller.signup);
+routes.get('/',restrictTo(['admin']),controller.getOrganization);
+
 
 
 

@@ -2,26 +2,37 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    height: 88vh;
+    width: 95vw;
 }
 
 #top{
     background-color: rgb(220, 235, 140);
-    padding-inline: 30px;
-    border-radius: 5%;
+    padding-inline: 10px;
+    border-radius: 20px;
+    height: 100%;
+    width: 40%;
 }
 #main{
     background-color: rgb(235, 218, 140);
-    padding-inline: 90px;
-    border-radius: 5%;
+    padding-inline: 10px;
+    border-radius: 20px;
+    height: 100%;
+    width: 40%;
 }
 
 #back{
-    width: 70px;
-    height: 70px;
+    width:50px;
+    height:50px ;
     border-radius: 100%;
 }
 
 .stats{
     display: flex;
     flex-direction: row;
+}
+
+img{
+    height: 60%;
+    width: 90%;
 }

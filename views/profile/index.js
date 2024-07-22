@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
         // console.log(playerData , data)
         display(data.data.name ,playerData.playerType ,playerData.matches ,playerData.runs ,playerData.wickets,playerData.fours,playerData.sixes,playerData.highestScore,playerData.highestWickets,playerData.balls,playerData.overs);
         dispalyPhoto(playerData.imageUrl)
-    } catch (error) {
+    } catch (err) {
         alert(err.response.data.message);
     }
 });
@@ -73,6 +73,7 @@ function uploadPhoto(file){
                 const data = await axios.post(`/user/api/data/photo`,formData,{headers:{'Authorization':token,'Content-Type': 'multipart/form-data'},'enctype':"multipart/form-data"})
                     .catch((err)=>{alert(err.response.data.message)});
                 dispalyPhoto(data.data.imageUrl);
+                console.log(data.data.imageUrl);
             },
             MIME_TYPE,
             QUALITY

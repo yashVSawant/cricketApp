@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./index.css">
+    <title>admin</title>
+</head>
+<body>
+    <header>
+        <h2>ADMIN</h2>
+    </header>
+    <div id="container">
+        <form>
+            <label for="name">Name :</label>
+            <input type="text" name="name" id="name">
+            <label for="name">Email :</label>
+            <input type="email" name="email" id="email">
+            <label for="name">Village :</label>
+            <input type="text" name="village" id="village">
+            <label for="name">Taluka :</label>
+            <input type="text" name="taluka" id="taluka">
+            <label for="name">Password :</label>
+            <input type="password" name="password" id="password">
+            <label for="confirmPassword">Confirm Password :</label>
+            <input type="password" name="confirmPassword" id="confirmPassword">
+            <button type="submit" id="submit">Create Organization</button>
+        </form>
+    </div>
+    <div id="showOrganizations">
+
+    </div>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="./index.js"></script>
+</body>
+</html>
