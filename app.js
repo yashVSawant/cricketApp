@@ -3,6 +3,7 @@ const express = require('express');
 const socketIo = require('socket.io')
 const path = require('path');
 const cors = require('cors');
+const fs = require('fs')
 
 const bodyParser = require("body-parser");
 const sequelize = require('./utils/database');
@@ -68,7 +69,12 @@ app.use('/match/api',matchRoutes);
 app.use('/payment/api',paymentRoutes);
 
 app.use((req,res)=>{
-        res.sendFile(path.join(__dirname,'views',`${req.url}`))  
+        if(fs.existsSync(path.join(__dirname,'views',`${req.url}`))){
+            res.sendFile(path.join(__dirname,'views',`${req.url}`))  
+        }else{
+            res.redirect('/error/index.html') 
+        }
+        
 })
 app.use(errorHandler)
 

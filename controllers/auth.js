@@ -15,7 +15,7 @@ exports.signup = async(req,res,next)=>{
         name = name.trim();
         password = password.trim();
         if(isNullValue(name) || isNullValue(password) ||isNullValue(playerType)){
-            throw new Error("invalid input!");
+            throw new ApiError("invalid input!",400);
         }
         const isExist = await user.findOne({where:{name:name}})
         if(isExist)throw new ApiError('username already exists!' ,400)
