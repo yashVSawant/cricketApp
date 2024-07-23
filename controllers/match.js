@@ -9,21 +9,17 @@ const order = require('../models/order');
 const { Op } = require('sequelize');
 require('dotenv').config();
 const ApiError = require('../utils/ApiErrors');
+const {asyncErrorHandler} = require('../utils/asyncErrorHandler');
 
 
-exports.getBowlerUpdate = async(req,res,next)=>{
-    try {
+exports.getBowlerUpdate = asyncErrorHandler(async(req,res)=>{
         const {id } = req.params;
         if(isNullValue(id))throw ApiError('invalid input!',400)
         const bowler = await bowlerLiveData.findAll({where:{matchId:id}});
         res.status(200).json({success:true,bowler});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.updateBowlerUpdate = async(req,res,next)=>{
-    try {
+exports.updateBowlerUpdate = asyncErrorHandler(async(req,res)=>{
         const {userId ,runs ,overs} = req.body;
         const {id} = req.params;
         if(isNullValue(id) || isNullValue(userId) || isNullValue(runs) || isNullValue(overs))throw ApiError('invalid input!',400)
@@ -32,12 +28,8 @@ exports.updateBowlerUpdate = async(req,res,next)=>{
             runs ,overs:overs 
         })
         res.status(201).json({success:true});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
-exports.updateBowlerWicket = async(req,res,next)=>{
-    try {
+})
+exports.updateBowlerWicket = asyncErrorHandler(async(req,res)=>{
         const {userId ,wickets} = req.body;
         const {id} = req.params;
         if(isNullValue(id)|| isNullValue(userId) || isNullValue(wickets))throw ApiError('invalid input!',400)
@@ -46,13 +38,9 @@ exports.updateBowlerWicket = async(req,res,next)=>{
             wickets 
         })
         res.status(201).json({success:true});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.postBowlerUpdate = async(req,res,next)=>{
-    try {
+exports.postBowlerUpdate = asyncErrorHandler(async(req,res)=>{
         const {userId} = req.body;
         const {id}= req.params;  
         if(isNullValue(id)|| isNullValue(userId))throw ApiError('invalid input!',400)  
@@ -61,25 +49,17 @@ exports.postBowlerUpdate = async(req,res,next)=>{
             matchId:id
         })
         res.status(201).json({success:true});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
 // hhh
-exports.getBatterUpdate = async(req,res,next)=>{
-    try {
+exports.getBatterUpdate = asyncErrorHandler(async(req,res)=>{
         const {id } = req.params;
         if(isNullValue(id))throw ApiError('invalid input!',400)
         const batters = await batterLiveData.findAll({where:{matchId:id}});
         res.status(200).json({success:true,batters});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.updateBatterUpdate = async(req,res,next)=>{
-    try {
+exports.updateBatterUpdate = asyncErrorHandler(async(req,res)=>{
         const {userId ,runs ,fours ,sixes ,balls,state} = req.body;
         const {id}= req.params; 
         if(isNullValue(id)|| isNullValue(userId) || isNullValue(runs)||isNullValue(fours)||isNullValue(sixes)||isNullValue(balls)||isNullValue(state))throw ApiError('invalid input!',400)
@@ -88,13 +68,9 @@ exports.updateBatterUpdate = async(req,res,next)=>{
             state ,runs ,fours ,sixes ,balls
         })
         res.status(201).json({success:true});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.postBatterUpdate = async(req,res,next)=>{
-    try {
+exports.postBatterUpdate = asyncErrorHandler(async(req,res)=>{
         const {userId} = req.body;
         const {id} = req.params;
         if(isNullValue(id)||isNullValue(userId))throw ApiError('invalid input!',400)
@@ -103,12 +79,9 @@ exports.postBatterUpdate = async(req,res,next)=>{
             matchId:id
         })
         res.status(201).json({success:true});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.postMatch = async(req,res,next)=>{
+exports.postMatch = asyncErrorHandler(async(req,res)=>{
     const transaction = await sequelize.transaction();
     try {
         const {team1Id ,team2Id,tournamentId,overs,orderId} = req.body;
@@ -158,11 +131,10 @@ exports.postMatch = async(req,res,next)=>{
         
     } catch (err) {
         await transaction.rollback();
-        next(new ApiError(err.message ,err.statusCode))
+        throw new ApiError(err.message ,err.statusCode)
     }
-}
-exports.updateMatch = async(req,res,next)=>{
-    try {
+})
+exports.updateMatch = asyncErrorHandler(async(req,res)=>{
         const {inning,runs,wickets,overs,balls} = req.body;
         const {id} = req.params;
         if(isNullValue(id)||isNullValue(inning)||isNullValue(runs)||isNullValue(wickets)||isNullValue(overs)||isNullValue(balls))throw ApiError('invalid input!',400)
@@ -178,24 +150,16 @@ exports.updateMatch = async(req,res,next)=>{
             });
         }
         res.status(201).json({success:true});    
-        
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.getMatch = async(req ,res ,next)=>{
-    try {
+exports.getMatch = asyncErrorHandler(async(req ,res )=>{
         const {id } = req.params;
         if(isNullValue(id))throw ApiError('invalid input!',400)
         const getMatch = await match.findOne({where:{tournamentId:id,isLive:true}});
         res.status(201).json({success:true,match:getMatch});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.endMatch = async(req,res,next)=>{
+exports.endMatch = asyncErrorHandler(async(req,res)=>{
     const transaction = await sequelize.transaction();
     try {
         const {id} = req.params;
@@ -250,9 +214,9 @@ exports.endMatch = async(req,res,next)=>{
         
     } catch (err) {
         await transaction.rollback();
-        next(new ApiError(err.message ,err.statusCode))
+        throw new ApiError(err.message ,err.statusCode)
     }
-}
+})
 
 function isNullValue(value){
     return value === ""?true :false;

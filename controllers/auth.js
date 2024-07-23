@@ -2,13 +2,14 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const sequelize = require('../utils/database');
 const ApiError = require('../utils/ApiErrors');
+const {asyncErrorHandler} = require('../utils/asyncErrorHandler')
 
 const user = require('../models/user');
 const userData = require('../models/userData');
 
 const hashService = require('../services/bcrypt');
 
-exports.signup = async(req,res,next)=>{
+exports.signup = asyncErrorHandler(async(req,res)=>{
     const transaction = await sequelize.transaction();
     try{
         let {name , password ,playerType} = req.body;
@@ -33,13 +34,12 @@ exports.signup = async(req,res,next)=>{
         res.status(201).json({success:true});      
     }catch(err){
         await transaction.rollback();
-        next(new ApiError(err.message ,err.statusCode))
+        throw new ApiError(err.message ,err.statusCode)
     }
     
-}
+})
 
-exports.login = async(req,res,next)=>{
-    try{
+exports.login = asyncErrorHandler(async(req,res)=>{
         const {name , password} = req.body;
         if(isNullValue(name) || isNullValue(password))throw new ApiError('invalid input!' ,400)
 
@@ -50,11 +50,7 @@ exports.login = async(req,res,next)=>{
         let link = '../home/index.html';
         if(checkUser.role === 'organization')link = '../organization-home/index.html'
         res.status(200).json({success:true , token:generateAccessToken(checkUser.id,checkUser.name,checkUser.role) ,link});      
-        
-    }catch(err){
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
 function isNullValue(value){
     return value === ""?true :false;

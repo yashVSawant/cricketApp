@@ -1,20 +1,41 @@
+
 #container{
     display: flex;
     justify-content: space-around;
     flex-direction: row;
+    background-color: aquamarine;
+    height: 90vh;
 }
 
-.main{
-    height: 400px;
+button{
+    background-color: black;
+    color:white;
+    border-radius: 8px;
+    margin: 0.1vh;
+}
+#startDiv label{
+    background-color: rgb(143, 136, 136);
+    height: 10vh;
+}
+
+#startDiv{
+    background-color: rgb(195, 255, 127);
+    height: 10vh;
 }
 .playerDiv{
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 40px;
+    height: 9vh;
     background-color: rgb(236, 192, 135);
     border-radius: 10px;
     padding-inline-start: 5px;
+}
+.titleBar{
+    display: flex;
+    justify-content: center;
+    height: 20vh;
+    width: 40vw;
 }
 .findPlayerDiv{
     display: flex;
@@ -24,4 +45,12 @@
 .findTeamDiv{
     display: flex;
     flex-direction: column;
+}
+.main{
+    overflow-y: auto;
+    height: 55vh;
+}
+input{
+    width: 10vw;
+    height: 3vh;
 }

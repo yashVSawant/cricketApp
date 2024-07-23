@@ -4,8 +4,9 @@ const hashService = require('../services/bcrypt');
 const organizerData = require('../models/organizerData');
 const sequelize = require('../utils/database');
 const ApiError = require('../utils/ApiErrors');
+const {asyncErrorHandler} = require('../utils/asyncErrorHandler');
 
-exports.signup = async(req ,res ,next)=>{
+exports.signup = asyncErrorHandler(async(req ,res)=>{
     const transaction = await sequelize.transaction();
     try{
         const {name ,email ,village,taluka,password} = req.body;
@@ -30,19 +31,15 @@ exports.signup = async(req ,res ,next)=>{
     }catch(err){
         // console.log(err)
         await transaction.rollback();
-        next(new ApiError(err.message ,err.statusCode))
+        throw new ApiError(err.message ,err.statusCode)
     }
 
-}
+})
 
-exports.getOrganization = async(req,res,next)=>{
-    try {
+exports.getOrganization = asyncErrorHandler(async(req,res)=>{
         const organizations = await user.findAll({where:{role:'organization'},attributes:['id','name']});
-        res.status(200).json({success:true,organizations})
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+        res.status(200).json({success:true,organizations});
+})
 
 function isNullValue(value){
     return value === ""?true :false;

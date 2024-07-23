@@ -57,10 +57,9 @@ user.belongsToMany(team,{ through: teamList });
 app.use(express.static('views'));
 app.use(bodyParser.json());
 app.use(cors({origin:'*'}));
-app.use(authenticate);
 
 app.use('/auth/api',authRoutes);
-
+app.use(authenticate);
 app.use('/user/api',userRoutes);
 app.use('/tournament/api',tournamentRoutes);
 app.use('/organization/api',organizationRoutes);

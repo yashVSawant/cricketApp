@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const ApiError = require('../utils/ApiErrors');
+const {asyncErrorHandler} = require('../utils/asyncErrorHandler');
 
-exports.login = async(req,res,next)=>{
-    try{
+exports.login = asyncErrorHandler(async(req,res)=>{
         const {name , password} = req.body;
         if(isNullValue(name) || isNullValue(password)){
             throw new ApiError("invalid input!",400);
@@ -13,10 +13,7 @@ exports.login = async(req,res,next)=>{
         }else{
             throw new ApiError("admin not found",404);
         }
-    }catch(err){
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
 function isNullValue(value){
     return value === ""?true :false;

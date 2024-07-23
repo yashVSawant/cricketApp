@@ -3,9 +3,9 @@ const user = require('../models/user');
 const teamList = require('../models/teamList');
 const hash = require('../services/bcrypt');
 const ApiError = require('../utils/ApiErrors');
+const {asyncErrorHandler}= require('../utils/asyncErrorHandler');
 
-exports.getPlayersAndTeam = async(req,res,next)=>{
-    try{
+exports.getPlayersAndTeam = asyncErrorHandler(async(req,res)=>{
         const {name ,password} = req.body;
         if(isNullValue(name) || isNullValue(password))throw new ApiError('invalid input!' ,400)
         const getTeam = await team.findOne({where:{name:name},attributes:['id','name','password']});
@@ -17,35 +17,23 @@ exports.getPlayersAndTeam = async(req,res,next)=>{
         }else{
             res.status(404).json({success:false ,message:'team not found'});
         }
-    }catch(err){
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
-exports.getPlayers = async(req,res,next)=>{
-    try{
+})
+exports.getPlayers = asyncErrorHandler(async(req,res)=>{
         const {id} = req.params;
         if(isNullValue(id))throw new ApiError('invalid input!' ,400)
         const getTeam = await team.findOne({where:{id:id},attributes:['id','name','captainName']});
         const getplayersInTeam = await getTeam.getUsers({attributes:['id','name']});
         const isCaptain = getTeam.captainName === req.user.name?true:false;
         res.status(200).json({success:true ,players:getplayersInTeam ,team:getTeam ,isCaptain});
-    }catch(err){
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.getTeam = async(req,res,next)=>{
-    try {
+exports.getTeam = asyncErrorHandler(async(req,res)=>{
         const getUser = req.user;
         const playersInTeam = await getUser.getTeams({attributes:['id','name']})
         res.status(200).json({success:true ,team:playersInTeam});
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.postTeam = async(req,res,next)=>{
-    try{
+exports.postTeam = (async(req,res)=>{
         const {name ,password} = req.body;
         if(isNullValue(name) || isNullValue(password))throw new ApiError('invalid input!' ,400)
         const hashPassword = await hash.createHash(password);
@@ -55,12 +43,8 @@ exports.postTeam = async(req,res,next)=>{
             teamId:post.id
         });
         res.status(200).json({success:true,team:post});
-    }catch(err){
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
-exports.deleteTeam = async(req,res,next)=>{
-    try{
+})
+exports.deleteTeam = asyncErrorHandler(async(req,res)=>{
         const {id} = req.params;
         if(isNullValue(id))throw new ApiError('invalid input!' ,400)
         const getTeam = await team.findByPk(id);
@@ -70,13 +54,9 @@ exports.deleteTeam = async(req,res,next)=>{
         }else{
             res.status(403).json({success:true});
         }
-    }catch(err){
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.addPlayer = async(req,res,next)=>{
-    try {
+exports.addPlayer = asyncErrorHandler(async(req,res)=>{
         let {name ,password ,teamId} = req.body;
         if(isNullValue(name) || isNullValue(password)||isNullValue(teamId))throw new ApiError('invalid input!' ,400)
         const getTeamCount = await teamList.count({where:{teamId:teamId}});
@@ -93,15 +73,9 @@ exports.addPlayer = async(req,res,next)=>{
                         teamId:teamId
                     });
                     res.status(201).json({success:true,player:getUser});
-                
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-        
-    }
-}
+})
 
-exports.removePlayer = async(req ,res,next)=>{
-    try {
+exports.removePlayer = asyncErrorHandler(async(req ,res)=>{
         const {id,teamId} = req.params;
         if(isNullValue(id) || isNullValue(teamId))throw new ApiError('invalid input!' ,400)
         const getTeam = await team.findByPk(teamId);
@@ -113,10 +87,7 @@ exports.removePlayer = async(req ,res,next)=>{
                 teamId:teamId
         }});
         res.status(201).json({success:true});           
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
 function isNullValue(value){
     return value === ""?true :false;

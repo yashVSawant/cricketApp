@@ -4,9 +4,9 @@ const match = require('../models/match');
 const { Op } = require('sequelize');
 const hashService = require('../services/bcrypt');
 const ApiError = require('../utils/ApiErrors');
+const {asyncErrorHandler} = require('../utils/asyncErrorHandler');
 
-exports.ongoingTournaments = async(req,res,next)=>{
-    try {
+exports.ongoingTournaments = asyncErrorHandler(async(req,res)=>{
         let day = new Date();
         day.setHours(0,0,0,0);
         let today = new Date(day);
@@ -25,13 +25,9 @@ exports.ongoingTournaments = async(req,res,next)=>{
             }]
         })
         res.status(200).json({success:true , info});
-    }catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
-exports.postTournament = async(req,res,next)=>{
-    try {
+exports.postTournament = asyncErrorHandler(async(req,res)=>{
         const {name , startDate , endDate ,address,password }  = req.body;
         if(isNullValue(name) || isNullValue(startDate)||isNullValue(endDate)||isNullValue(address)||isNullValue(password))throw new ApiError('invalid input!' ,400)
         if((new Date(startDate)<new Date() || new Date(startDate) > new Date(endDate)))throw new ApiError('invalid dates!',400)
@@ -44,14 +40,8 @@ exports.postTournament = async(req,res,next)=>{
                     userId:req.user.id
             })
             res.status(201).json({success:true ,tournament:post});
-        
-    } catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-    
-}
-exports.getTournaments = async(req,res,next)=>{
-    try {
+})
+exports.getTournaments = asyncErrorHandler(async(req,res)=>{
         let day = new Date();
         day.setHours(0,0,0,0);
         let today = new Date(day);
@@ -65,10 +55,7 @@ exports.getTournaments = async(req,res,next)=>{
             
         })
         res.status(200).json({success:true , tournaments});
-    }catch (err) {
-        next(new ApiError(err.message ,err.statusCode))
-    }
-}
+})
 
 function isNullValue(value){
     return value === ""?true :false;
