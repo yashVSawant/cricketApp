@@ -1,6 +1,5 @@
 const tournament = require('../models/tournament');
 const user = require('../models/user');
-const match = require('../models/match');
 const { Op } = require('sequelize');
 const hashService = require('../services/bcrypt');
 const ApiError = require('../utils/ApiErrors');

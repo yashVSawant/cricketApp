@@ -7,7 +7,7 @@ exports.createHash = (password)=>{
         if(!err){  
             res(hash);
         }else{
-            rej();
+            rej(err);
         }
     })})
 }
@@ -16,7 +16,7 @@ exports.compareHash = (password ,hash)=>{
     return new Promise((res,rej)=>{
         bcrypt.compare(password ,hash ,(err ,result)=>{
             if(err){
-                rej(err.message);
+                rej(err);
             }
             if(result){
                 res('success');

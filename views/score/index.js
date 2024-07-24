@@ -110,12 +110,13 @@ function updateBowlerWickets(id ,inning,wickets){
 }
 
 function updateBowlerStats(id ,inning,over,runs){
+    let balls = overs%10;
     let overs = over/10;
     if(over%6 === 0)overs = over/6;
     document.getElementById(`${inning}ballerOvers${id}`).innerText = overs;
     // document.getElementById(`${inning}ballerWickets${id}`)
     document.getElementById(`${inning}ballerRuns${id}`).innerText = runs;
-    const rr = (Math.round((runs/((Math.round(overs)*6)+over%10))*100))/100 || 0;
+    const rr = (Math.round((runs/((Math.round(overs)*6)+balls)*6)*100))/100 || 0;
     document.getElementById(`${inning}rr${id}`).innerText = rr;
 
 }
@@ -169,17 +170,17 @@ function displayBatterStats(id ,inning,runs,sixes,fours,balls,name,state){
 function displayBowlerStats(id ,inning,runs ,wickets,overs,name){
 
     const table = document.getElementById(`ballersTable${inning}`);
-    const currentBallerName = document.getElementById('currentBallerName');
+    // const currentBallerName = document.getElementById(`batterName${id}`);
     const row = document.createElement('tr');
-    let over = Math.floor(overs/10);//(Math.round(currentBallerRuns/((bowlerOvers*6)+balls)*6)*100)/100;
+    let over = Math.floor(overs/10);
     let balls = overs%10;
-    console.log(balls)
-    if(balls%6 === 0){
+    console.log(id )
+    if(balls%6 === 0 && balls != 0){
         over++;
         balls = 0
     }
     const rr = (Math.floor(runs/((over*6)+balls)*6)*100)/100 || 0
-    currentBallerName.innerText = name;
+    // currentBallerName.innerText = name;
     row.id = `bowler${id}`;
     row.innerHTML =`
                         <td id="ballerName${id}">${name}</td>
@@ -205,7 +206,7 @@ function showPlayer(teamNo,id ,name){
 }
 function createNewBaller(id,name,inning){
     const table = document.getElementById(`ballersTable${inning}`);
-    const currentBallerName = document.getElementById('currentBallerName');
+    const currentBallerName = document.getElementById(`batterName${id}`);
     const row = document.createElement('tr');
 
     currentBallerName.innerText = name;

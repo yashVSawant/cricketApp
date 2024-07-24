@@ -163,9 +163,10 @@ exports.endMatch = asyncErrorHandler(async(req,res)=>{
     const transaction = await sequelize.transaction();
     try {
         const {id} = req.params;
-        const {orderId} = req.body;
-        if(isNullValue(id)||isNullValue(orderId))throw ApiError('invalid input!',400)
-        await order.update({isValid:false},{where:{orderId:orderId}},{transaction});
+        if(isNullValue(id))throw ApiError('invalid input!',400)
+        const getMatch = await match.findByPk(id);
+        if(!getMatch)throw new ApiError('match not found!',404)
+        if(!getMatch.isLive)throw new ApiError('match already ended!' , 400);   
         await match.update({isLive:false},{where:{id:id}},{transaction});
         const getBattersData = await batterLiveData.findAll({where:{matchId:id}},{transaction});
         for( let batterData of getBattersData){
@@ -219,5 +220,5 @@ exports.endMatch = asyncErrorHandler(async(req,res)=>{
 })
 
 function isNullValue(value){
-    return value === ""?true :false;
+    return value === "" ?true :false;
 }

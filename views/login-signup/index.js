@@ -46,7 +46,7 @@ login.addEventListener('click',async()=>{
             const data = await axios.post('/auth/api/login',{name  ,password });
             console.log(data.data);
             const link = data.data.link;
-            localStorage.setItem('token',`bearer ${data.data.token}`);
+            localStorage.setItem('token',`Bearer ${data.data.token}`);
             window.location.href = link;
         } catch (err) {
             alert(err.response.data.message);

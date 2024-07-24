@@ -240,7 +240,9 @@ function displayInputDiv(){
                 
                 const playerData = await axios.post('/team/api/addPlayer',{name,password,teamId} ,{headers:{'Authorization':token}});
                 const player = playerData.data.player;
-                showPlayers(player.id ,player.name);
+                showPlayers(player.id ,player.name,true);
+                document.getElementById('playerName').value = "";
+                document.getElementById('playerPassword').value="";
             } catch (err) {
                 alert(err.response.data.message)
             }

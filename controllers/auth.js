@@ -45,7 +45,6 @@ exports.login = asyncErrorHandler(async(req,res)=>{
 
         let checkUser = await user.findOne({where:{name:name}});
         if(!checkUser)throw new ApiError("user not found",404);
-
         await hashService.compareHash(password ,checkUser.password);
         let link = '../home/index.html';
         if(checkUser.role === 'organization')link = '../organization-home/index.html'

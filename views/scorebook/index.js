@@ -61,7 +61,7 @@ socket.on('getUpdate',(data,typeOfdata)=>{
     console.log(data , typeOfdata)
 })
 
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('DOMContentLoaded',async()=>{
     const oversMatch1 = document.getElementById('oversMatch1');
     const oversMatch2 = document.getElementById('oversMatch2');
     const battingFirst = localStorage.getItem('battingFirst');
@@ -94,7 +94,6 @@ window.addEventListener('DOMContentLoaded',()=>{
         showPlayer(2,player.id, player.name)
         
     })
-    
     socket.emit('watch-score',tournamentId);
 })
 
@@ -552,8 +551,8 @@ async function matchEnd(){
     alert(`${wonTeam} ${result} !`);
     alert('match end');
     inningEnd();
+    await axios.put(`/match/api//endMatch`,{},{headers:{'Authorization':token}})
     updateButtons.style.display = 'none'
-    await axios.put(`/match/api/${matchId}/endMatch`,{},{headers:{'Authorization':token}});
     window.location.href = '../organization-home/index.html'
 }
 

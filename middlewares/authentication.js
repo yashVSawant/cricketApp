@@ -5,9 +5,10 @@ const user = require('../models/user');
 const ApiError = require('../utils/ApiErrors');
 const {asyncErrorHandler} = require('../utils/asyncErrorHandler');
 
-const authenticate = async(req,res,next)=>{
+const authenticate = asyncErrorHandler(async(req,res,next)=>{
         const fullToken = req.header('Authorization');
-        const token = fullToken?.split("bearer ")[1] || null;
+        if(!fullToken)return next();
+        const token = fullToken.split("Bearer ")[1];
         const tokenClient =  jwt.verify(token , process.env.TOKENKEY);
         const client = await user.findByPk(tokenClient.id);
         if(!client){
@@ -17,7 +18,7 @@ const authenticate = async(req,res,next)=>{
             req.user = client;
         }
         next();
-}
+})
 
 const restrictTo = (role)=>{
     return asyncErrorHandler((req,res,next)=>{

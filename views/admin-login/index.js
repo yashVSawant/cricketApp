@@ -7,7 +7,7 @@ login.addEventListener('click',async()=>{
     if(name ,password){
         try {
             const data = await axios.post('/auth/api/admin/login',{name  ,password });
-            localStorage.setItem('token',`bearer ${data.data.token}`);
+            localStorage.setItem('token',`Bearer ${data.data.token}`);
             window.location.href = '../admin/index.html';
         } catch (err) {
             alert(err.response.data.message);

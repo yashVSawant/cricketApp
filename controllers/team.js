@@ -64,7 +64,7 @@ exports.addPlayer = asyncErrorHandler(async(req,res)=>{
         name = name.trim();
         password = password.trim();
         if(getTeam.captainName != req.user.name)throw new ApiError('You are not a captain!',400)
-            if(getTeamCount > 11)throw new ApiError('team is full!',400)
+            if(getTeamCount >= 11)throw new ApiError('team is full!',400)
                 const getUser = await user.findOne({where:{name:name}});
                 if(!getUser)throw new ApiError('user not found!',404)
                     await hash.compareHash(password , getUser.password);
