@@ -1,5 +1,5 @@
 {
     "version":"35.1.0",
     "builds":[{"src":"./app.js" , "use":"@vercel/node"}],
-    "routes":[{"src":"/(.*)" ,"des":"/"}]
+    "routes":[{"src":"/(.*)" ,"dest":"/"}]
 }
