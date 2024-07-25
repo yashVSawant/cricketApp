@@ -1,16 +1,17 @@
-const host = 'http://localhost:3333';
+
 const token = localStorage.getItem('token');
 const back = document.getElementById('back');
 const upload = document.getElementById('upload');
 
 window.addEventListener('DOMContentLoaded',async()=>{
     try {
-        const data = await axios.get(`${host}/user/api/data`,{headers:{'Authorization':token}});
+        const data = await axios.get('/user/api/data',{headers:{'Authorization':token}});
         const playerData = data.data.data;
         // console.log(playerData , data)
         display(data.data.name ,playerData.playerType ,playerData.matches ,playerData.runs ,playerData.wickets,playerData.fours,playerData.sixes,playerData.highestScore,playerData.highestWickets,playerData.balls,playerData.overs);
         dispalyPhoto(playerData.imageUrl)
     } catch (err) {
+        console.log(err)
         alert(err.response.data.message);
     }
 });

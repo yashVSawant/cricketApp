@@ -1,5 +1,6 @@
 const express = require('express');
 
+require('dotenv').config();
 const socketIo = require('socket.io')
 const path = require('path');
 const cors = require('cors');
@@ -81,7 +82,7 @@ sequelize
 .sync()
 // .sync({force:true})
 .then(()=>{
-    const server = app.listen(3000, () => {
+    const server = app.listen(process.env.PORT || 3000, () => {
         console.log('Server running!')
     });
 
