@@ -81,7 +81,7 @@ sequelize
 .sync()
 // .sync({force:true})
 .then(()=>{
-    const server = app.listen(3333, () => {
+    const server = app.listen(3000, () => {
         console.log('Server running!')
     });
 
