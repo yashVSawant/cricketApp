@@ -1,11 +1,11 @@
 body {
-    /* width: 100%; */
+    width: 100vw;
     height: 100vh;
     margin: 0;
     padding: 0;
     display: flex;
-    align-items: stretch;
-    justify-content: stretch;
+    /* align-items: stretch;
+    justify-content: stretch; */
     /* background-color: rgb(209, 141, 141);  */
 }
 #main{
@@ -17,17 +17,27 @@ body {
 }
 #container{
     display: flex;
-    flex-direction: row;
-    flex: 1;        
+    flex: 1;
     width: 100%;
     height: 99%;
-    background-color: rgb(243, 207, 207); 
-}
-#left{
-    display: flex;
+    /* background-color: rgb(253, 239, 109); */
     flex-direction: column;
-    width: 300px;
-    height: 100%;
+}
+header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 22vh;
+    justify-content: space-around;
+    background-color: rgb(248, 234, 110);
+}
+nav{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 50vw;
+    overflow: auto;
 }
 #batter{
 width: 50%;
@@ -41,7 +51,8 @@ width: 50%;
     background-color: rgb(227, 248, 152);
     justify-content: space-around;
     border-radius: 20px;
-    flex-wrap: wrap;
+    width: 100vw;
+    align-items: center;
 }
 .playerDiv{
     display: flex;
@@ -55,7 +66,7 @@ width: 50%;
 }
 .playerDiv button{
     height: 18px;
-    border-radius: 20%;
+    border-radius: 10px;
     background-color: rgb(247, 150, 111);
 }
 .leaderboard{
@@ -68,13 +79,16 @@ width: 50%;
     justify-content: space-around;
 }
 button{
-    height: 40px;
-    border-radius: 20%;
-    background-color: rgb(236, 234, 66);
+    height: 10vh;
+    border-radius: 20px;
+    background-color: rgb(248, 234, 110);;
+    margin: 3px;
+    font-size: large;
+    border: solid 0px ;
 }
 div{
     margin: 2px;
     border-color: black;
     border: 1px;
-    background-color: rgb(250, 239, 239);
+    /* background-color: rgb(248, 237, 86); */
 }

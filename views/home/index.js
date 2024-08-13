@@ -1,27 +1,35 @@
 const profile = document.getElementById('profile');
 const tournaments = document.getElementById('tournaments');
-const showTeam = document.getElementById('showTeam');
-const createTeam = document.getElementById('createTeam');
+const showTeamDiv = document.getElementById('showTeamDiv');
+const displayLeaderBoard = document.getElementById('displayLeaderBoard');
 const displayPlayers = document.getElementById('displayPlayers');
+const createTeamDiv = document.getElementById('createTeamDiv');
+const logout = document.getElementById("logout");
+
+const showTeam = document.getElementById('showTeam')
+const createTeam = document.getElementById('createTeam');
+
 const create = document.getElementById('create');
 const leaderboard = document.getElementById('leaderboard')
-const displayLeaderBoard = document.getElementById('displayLeaderBoard');
+
 
 let teamId = 0;
 
-const host = 'http://localhost:3333';
+const userName = localStorage.getItem('userName');
 const token = localStorage.getItem('token');
 
 window.addEventListener('DOMContentLoaded',async()=>{
     try {
-        const info = await axios.get('/tournament/api/ongonigTournaments',{headers:{'Authorization':token}});
-        info.data.info.forEach((t)=>{
-            displayTournaments(t.id , t.name ,t.startDate ,t.endDate ,t.address);
-        });
-        const data = await axios.get('/team/api/',{headers:{'Authorization':token}});
-        data.data.team.forEach((t)=>{
-            displayTeam(t.id ,t.name);
-        });
+        const data = await axios.get('/tournament/api/ongonigTournaments',{headers:{'Authorization':token}});
+        if(data.data.info.length === 0){
+            displayNoTournament()
+        }else{
+            data.data.info.forEach((t)=>{
+                displayTournaments(t.id , t.name ,t.startDate ,t.endDate ,t.address);
+            });
+        }
+        const userNameH1 = document.getElementById('userNameH1');
+        userNameH1.innerText = userName.toUpperCase();
         
     } catch (err) {
         alert(err.response.data.message);
@@ -29,43 +37,72 @@ window.addEventListener('DOMContentLoaded',async()=>{
     
 })
 
+logout.onclick = ()=>{
+    localStorage.removeItem('token');
+    location.href = '../login/index.html'
+}
+
 profile.onclick = async()=>{
     window.location.href = '../profile/index.html';
     
 }
-createTeam.onclick = ()=>{
-    const createTeamDiv = document.getElementById('createTeamDiv');
-    if(createTeamDiv.style.display === "inline"){
-        createTeamDiv.style.display = 'none'
+
+showTeam.onclick = async()=>{
+    if(showTeamDiv.innerHTML === ''){
+        clearMainDiv();
+        const data = await axios.get('/team/api/',{headers:{'Authorization':token}});
+            data.data.team.forEach((t)=>{
+                displayTeam(t.id ,t.name);
+            });
+            showTeamDiv.style.display = 'flex'
     }else{
-        createTeamDiv.style.display = 'inline'
+        clearMainDiv();
+        showTournament();
     }
 }
 
-create.onclick = async()=>{
-    const name = document.getElementById('name').value;
-    const password = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    if(name && password && confirmPassword){
-        if(password === confirmPassword){
-            try {
-                const post = await axios.post('/team/api/',{name , password },{headers:{'Authorization':token}});
-                const createTeamDiv = document.getElementById('createTeamDiv');
-                createTeamDiv.style.display = 'none';
-                alert('team posted');
-                displayTeam(post.data.team.id ,post.data.team.name);
-            } catch (err) {
-                console.log(err)
-                alert(err.response.data.message)
+createTeam.onclick = ()=>{
+    if(createTeamDiv.innerHTML === ""){
+        clearMainDiv();
+        createTeamDiv.innerHTML = `<label>enter team name:</label>
+                <input type="text" id="name">
+                <label>enter password:</label>
+                <input type="password" id="newPassword">
+                <label>confirm password:</label>
+                <input type="password" id="confirmPassword">
+                <button class="create">create</button>`
+    }else{
+        clearMainDiv();
+        showTournament()
+    }
+}
+
+createTeamDiv.addEventListener("click",async(e)=>{
+    if(e.target.classList.value === 'create'){
+        const name = document.getElementById('name').value;
+        const password = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        if(name && password && confirmPassword){
+            if(password === confirmPassword){
+                try {
+                    const post = await axios.post('/team/api/',{name , password },{headers:{'Authorization':token}});
+                    const createTeamDiv = document.getElementById('createTeamDiv');
+                    createTeamDiv.style.display = 'none';
+                    alert('team posted');
+                    displayTeam(post.data.team.id ,post.data.team.name);
+                } catch (err) {
+                    console.log(err)
+                    alert(err.response.data.message)
+                }
+            }else{
+                alert('password did not match')
             }
         }else{
-            alert('password did not match')
+            alert('please fill all fields')
         }
-    }else{
-        alert('please fill all fields')
     }
-    
-}
+
+})
 
 tournaments.addEventListener('click',(e)=>{
     if(e.target.classList.value === 'watchScore'){
@@ -75,19 +112,15 @@ tournaments.addEventListener('click',(e)=>{
     }
 })
 
-showTeam.addEventListener('click',async(e)=>{
+showTeamDiv.addEventListener('click',async(e)=>{
     if(e.target.classList.value === 'player'){
+        clearMainDiv();
         try {
             const id = e.target.parentNode.id;
             const data = await axios.get(`/team/api/${id}/players`,{headers:{'Authorization':token}});
-            tournaments.style.display = 'none';
-            displayLeaderBoard.innerHTML= '';
-            displayPlayers.innerHTML= '';
-            addBackButton(displayPlayers);
-            
-
+            // addBackButton(displayPlayers);
+            addTeamName(data.data.team.name);
             const isCaptain = data.data.isCaptain;
-            console.log(isCaptain)
             if(isCaptain){
                 addDeleteButton()
                 displayInputDiv();     
@@ -104,24 +137,27 @@ showTeam.addEventListener('click',async(e)=>{
 })
 
 leaderboard.onclick = async()=>{
-    displayPlayers.innerHTML= '';
-    tournaments.style.display = 'none';
     
-    displayLeaderBoard.innerHTML = `<div id="batter"><div>Batter</div></div>
-                <div id="bowler"><div>Bowler</div></div>`
-                
-    addBackButton(displayLeaderBoard);
-    try {
-        const batterData = await axios.get('/user/api/top5/batter',{headers:{'Authorization':token}});
-        const bowlerData = await axios.get('/user/api/top5/bowler',{headers:{'Authorization':token}});
-        batterData.data.top5.forEach((b)=>{
-            displayBatterBoard(b.user.name  , b.runs)
-        })
-        bowlerData.data.top5.forEach((b)=>{
-            displayBowlerBoard(b.user.name  , b.wickets)
-        })
-    } catch (err) {
-        alert(err.response.data.message)
+    if(displayLeaderBoard.innerHTML === ""){
+        clearMainDiv();
+        displayLeaderBoard.innerHTML = `<div id="batter"><h3>BATTER</h3></div>
+                    <div id="bowler"><h3>BOWLER</h3></div>`
+                    
+        try {
+            const batterData = await axios.get('/user/api/top5/batter',{headers:{'Authorization':token}});
+            const bowlerData = await axios.get('/user/api/top5/bowler',{headers:{'Authorization':token}});
+            batterData.data.top5.forEach((b)=>{
+                displayBatterBoard(b.user.name  , b.runs)
+            })
+            bowlerData.data.top5.forEach((b)=>{
+                displayBowlerBoard(b.user.name  , b.wickets)
+            })
+        } catch (err) {
+            alert(err.response.data.message)
+        }
+    }else{
+        clearMainDiv();
+        showTournament();
     }
     
     
@@ -164,6 +200,13 @@ function displayTournaments(id , name , startDate , endDate , location){
     </div>`;
     tournaments.appendChild(div);
 }
+function displayNoTournament(){
+    const div = document.createElement('div');
+    div.innerHTML = `<div>
+    <h4>No Ongoing Tournament! </h4>
+    </div>`;
+    tournaments.appendChild(div);
+}
 
 function displayTeam(id ,name){
     const div = document.createElement('div');
@@ -171,7 +214,18 @@ function displayTeam(id ,name){
     <h4>${name}</h4>
     <button class="player">players</button>
     </div>`;
-    showTeam.appendChild(div);
+    showTeamDiv.appendChild(div);
+}
+
+function clearMainDiv(){
+    showTeamDiv.innerHTML = "";
+    displayPlayers.innerHTML = "";
+    displayLeaderBoard.innerHTML = "";
+    createTeamDiv.innerHTML = "";
+    tournaments.style.display = "none"
+}
+function showTournament(){
+    tournaments.style.display = "flex";
 }
 
 function showPlayers(id ,name ,isCaptain){
@@ -185,19 +239,19 @@ function showPlayers(id ,name ,isCaptain){
     displayPlayers.appendChild(div);
 }
 
-function addBackButton(displayDiv){
-    const div = document.createElement('div');
-    div.innerHTML = '<button id="back">Back</button>'
-    displayDiv.appendChild(div);
+// function addBackButton(displayDiv){
+//     const div = document.createElement('div');
+//     div.innerHTML = '<button id="back">Back</button>'
+//     displayDiv.appendChild(div);
 
-    const back = document.getElementById('back');
+//     const back = document.getElementById('back');
 
-    back.onclick = ()=>{
-        displayPlayers.innerHTML= '';
-        tournaments.style.display = 'inline';
-        displayLeaderBoard.innerHTML ='';
-    }
-}
+//     back.onclick = ()=>{
+//         displayPlayers.innerHTML= '';
+//         tournaments.style.display = 'inline';
+//         displayLeaderBoard.innerHTML ='';
+//     }
+// }
 
 function addDeleteButton(){
     const div = document.createElement('div');
@@ -251,4 +305,10 @@ function displayInputDiv(){
         }
         
     }
+}
+
+function addTeamName(name){
+    const div = document.createElement('div');
+    div.innerHTML = `<h2>${name}</h2>`
+    displayPlayers.appendChild(div)
 }

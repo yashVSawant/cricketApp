@@ -154,8 +154,11 @@ exports.updateMatch = asyncErrorHandler(async(req,res)=>{
 
 exports.getMatch = asyncErrorHandler(async(req ,res )=>{
         const {id } = req.params;
-        if(isNullValue(id))throw ApiError('invalid input!',400)
-        const getMatch = await match.findOne({where:{tournamentId:id,isLive:true}});
+        if(isNullValue(id))throw ApiError('invalid input!',400);
+        const getMatch = await match.findOne({where:{tournamentId:id,isLive:true},order: [
+            ['id', 'DESC']
+          ]});
+          console.log(getMatch.id)
         res.status(201).json({success:true,match:getMatch});
 })
 

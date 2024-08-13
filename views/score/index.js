@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
     team2Data.data.players.forEach((p)=>{
         showPlayer(2,p.id ,p.name)
     })
-    console.log(battersData.data.batters,bowlersData.data.bowler)
+    // console.log(battersData.data.batters,bowlersData.data.bowler)
     battersData.data.batters.forEach((p)=>{
         const row = document.getElementById(`${p.userId}`);
         const name = document.getElementById(`batterName${p.userId}`).innerText
@@ -110,7 +110,7 @@ function updateBowlerWickets(id ,inning,wickets){
 }
 
 function updateBowlerStats(id ,inning,over,runs){
-    let balls = overs%10;
+    let balls = over%10;
     let overs = over/10;
     if(over%6 === 0)overs = over/6;
     document.getElementById(`${inning}ballerOvers${id}`).innerText = overs;

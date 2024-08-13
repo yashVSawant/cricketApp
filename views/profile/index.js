@@ -7,8 +7,8 @@ window.addEventListener('DOMContentLoaded',async()=>{
     try {
         const data = await axios.get('/user/api/data',{headers:{'Authorization':token}});
         const playerData = data.data.data;
-        // console.log(playerData , data)
-        display(data.data.name ,playerData.playerType ,playerData.matches ,playerData.runs ,playerData.wickets,playerData.fours,playerData.sixes,playerData.highestScore,playerData.highestWickets,playerData.balls,playerData.overs);
+        const name = data.data.name.toUpperCase()
+        display(name ,playerData.playerType ,playerData.matches ,playerData.runs ,playerData.wickets,playerData.fours,playerData.sixes,playerData.highestScore,playerData.highestWickets,playerData.balls,playerData.overs);
         dispalyPhoto(playerData.imageUrl)
     } catch (err) {
         console.log(err)

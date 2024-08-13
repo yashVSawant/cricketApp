@@ -684,6 +684,7 @@ function addBatterOnField(id){
 
 async function uploadScore(){
     try {
+        console.log(inning,runs,wickets,overs,balls)
         await axios.put(`/match/api/${matchId}/update`,{inning,runs,wickets,overs,balls},{headers:{'Authorization':token}});
     } catch (err) {
         console.log(err)

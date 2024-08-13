@@ -11,6 +11,7 @@ const sequelize = require('./utils/database');
 
 const app = express();
 
+const hashService = require('./services/bcrypt');
 const userRoutes = require('./routers/user');
 const authRoutes = require('./routers/auth');
 const tournamentRoutes = require('./routers/tournament');
@@ -55,12 +56,12 @@ team.belongsToMany(user,{ through: teamList });
 user.belongsToMany(team,{ through: teamList });
 
 
+app.use(cors({origin:'*'}));
 app.use(express.static('views'));
 app.use(bodyParser.json());
-app.use(cors({origin:'*'}));
+app.use(authenticate);
 
 app.use('/auth/api',authRoutes);
-app.use(authenticate);
 app.use('/user/api',userRoutes);
 app.use('/tournament/api',tournamentRoutes);
 app.use('/organization/api',organizationRoutes);
@@ -82,8 +83,22 @@ sequelize
 .sync()
 // .sync({force:true})
 .then(()=>{
-    const server = app.listen(process.env.PORT || 3000, () => {
-        console.log('Server running!')
+    const server = app.listen(process.env.PORT || 3000, async() => {
+        try{
+            const getUser = await user.findOne({where:{name:process.env.ADMIN_USERNAME}});
+            if(!getUser){
+                const hash = await hashService.createHash(process.env.ADMIN_PASSWORD);
+                await user.create({
+                    name:process.env.ADMIN_USERNAME,
+                    password:hash,
+                    role:'admin'
+                })
+            }
+            console.log('running')
+        }catch(err){
+            console.log(err)
+        }
+        
     });
 
     const io = socketIo(server);

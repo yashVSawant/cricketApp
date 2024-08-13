@@ -8,31 +8,16 @@
 </head>
 <body>
     <div id="container">
+        <header>
+            <nav><h1>SIGNUP</h1> <div class="otherPage">
+                <label>Already have account? :</label>
+                <button id="login">Login</button>
+            </div></nav>
+        </header>
         <div id="main">
-            
-            <div id="loginDiv" class="mainDiv" >
-                <div class="page">
-                    <div class="otherPage">
-                        <label>New User :</label>
-                        <button id="signupPage"> Signup</button>
-                    </div>
-                </div>
-                <div class="inputs">
-                    <label>Enter Username :</label>
-                    <input type="name" id="LoginUsername">
-                    <label>Enter Password :</label>
-                    <input type="password" id="LoginPassword">
-                </div>
-                <button class="submit" id="login">Login</button>
-            </div>
-            <div id="signupDiv" class="mainDiv" style="display: none;">
-                <div class="page">
-                    <div class="otherPage">
-                        <label>Already have account :</label>
-                        <button id="loginPage">Login</button>
-                    </div>
-                </div>
-                <div class="inputs">
+            <div id="signupDiv" class="mainDiv">
+                
+                <form class="inputs">
                     <label>Enter Name :</label>
                     <input type="text" id="name">
                     <div id="playerType">
@@ -43,12 +28,10 @@
                         <label>Allrounder</label>
                         <input type='radio' id="allrounder" name="playerType">
                     </div>
-                    <!-- <label>Enter Email :</label>
-                    <input type="email" id="email"> -->
                     <label>Enter Password :</label>
                     <input type="password" id="password">
                     <button class="submit" id="signup">Signup</button>
-                </div>
+                </form>
             </div>
         </div>
     </div>

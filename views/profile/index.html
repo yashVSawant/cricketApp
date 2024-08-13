@@ -7,15 +7,21 @@
     <title>profile</title>
 </head>
 <body>
-    <div><button id="back">back</button></div>
+    <header>
+        <div id="typeDiv"><h1 id="name"></h1>
+        (<a id="playerType"></a>)</div>
+        <nav>
+            <div><button id="back">back</button></div>
+        </nav>
+        
+    </header>
+    
     <div id="container">
         
         <div id="top">
             <input type="file" id="photoFile" accept="image/*">
             <button id="upload">+</button>
             <div id="image"></div>
-            <h1 id="name"></h1>
-            <a>(</a><a id="playerType"></a><a>)</a>
         </div>
         <div id="main">
             <div class="stats"><h3>Matches :</h3><h3 id="matches"></h3></div>

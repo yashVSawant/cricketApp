@@ -3,9 +3,6 @@ const token = localStorage.getItem('token');
 const findTeam1 = document.getElementById('findTeam1');
 const findTeam2 = document.getElementById('findTeam2');
 
-const fixTeam1 = document.getElementById('fixTeam1');
-const fixTeam2 = document.getElementById('fixTeam2');
-
 const start  = document.getElementById('start');
 
 let team1 = [];
@@ -18,9 +15,9 @@ start.onclick = async()=>{
     try {
         const matchOvers = document.getElementById('overs').value;
         const  battingFirst = document.querySelector('input[name="tossWon"]:checked').value;
-        
-        if(!team1Id)alert('please select team1')
-        else if(!team2Id)alert('please select team2')
+        console.log(team1 , team2)
+        if(team1.length != 11)alert('invalid team 1')
+        else if(team2.length != 11)alert('invalid team 2')
         else if(!matchOvers)alert('please enter overs')
         else{
             const tournamentId = +(localStorage.getItem('tournamentId'));
@@ -36,9 +33,10 @@ start.onclick = async()=>{
             }
             const overs = matchOvers;
             const orderId = localStorage.getItem('orderId');
-            const postMatch = await axios.post('/match/api/postMatch',{team1Id ,team2Id,tournamentId,overs,orderId},{headers:{'Authorization':token}});
+            console.log(team1 , team2)
+            // const postMatch = await axios.post('/match/api/postMatch',{team1Id ,team2Id,tournamentId,overs,orderId},{headers:{'Authorization':token}});
             
-            localStorage.setItem('matchId',(postMatch.data.match.id))
+            // localStorage.setItem('matchId',(postMatch.data.match.id))
             if(battingFirst === 'team2'){
                 console.log(team1Id ,team2Id)
                 let temp = team1Id;
@@ -47,6 +45,7 @@ start.onclick = async()=>{
                 console.log(team1Id ,team2Id)
             }
             location.href = '/scoreBook/index.html';
+
         }
     } catch (err) {
         console.log(err)
@@ -64,6 +63,7 @@ findTeam1.onclick = async()=>{
         showTeamName(1,teamData.data.team.name);
         team1Id = teamData.data.team.id
         showTeamDiv(teamData.data.players,1);
+        checkSelectedPlayer(1);
         
     } catch (err) {
         console.log(err)
@@ -79,6 +79,7 @@ findTeam2.onclick = async()=>{
         showTeamName(2,teamData.data.team.name);
         team2Id = teamData.data.team.id
         showTeamDiv(teamData.data.players,2);
+        checkSelectedPlayer(2);
         
     } catch (err) {
         console.log(err)
@@ -86,13 +87,6 @@ findTeam2.onclick = async()=>{
     }
 }
 
-
-fixTeam1.onclick = ()=>{
-    checkSelectedPlayer(1)
-}
-fixTeam2.onclick = ()=>{
-    checkSelectedPlayer(2)
-}
 
 function showTeamDiv(team,teamNo){
     const main = document.getElementById(`main${teamNo}`);
@@ -115,12 +109,12 @@ function showTeamName(teamNo,name){
 function checkSelectedPlayer(teamNo){
         if(teamNo===1){
             const name = document.getElementById('team1name').innerText;
-            localStorage.setItem('name1',name)
+            localStorage.setItem('name1',name);
             localStorage.setItem('team1',JSON.stringify(team1))
         }
         else {
             const name = document.getElementById('team2name').innerText;
-            localStorage.setItem('name2',name)
+            localStorage.setItem('name2',name);
             localStorage.setItem('team2',JSON.stringify(team2))
         }
         alert('team posted')

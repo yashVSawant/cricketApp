@@ -47,7 +47,8 @@ exports.login = asyncErrorHandler(async(req,res)=>{
         if(!checkUser)throw new ApiError("user not found",404);
         await hashService.compareHash(password ,checkUser.password);
         let link = '../home/index.html';
-        if(checkUser.role === 'organization')link = '../organization-home/index.html'
+        if(checkUser.role === 'organization')link = '../organization-home/index.html';
+        if(checkUser.role === 'admin')link = '../admin/index.html'
         res.status(200).json({success:true , token:generateAccessToken(checkUser.id,checkUser.name,checkUser.role) ,link});      
 })
 
