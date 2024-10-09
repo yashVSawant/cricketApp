@@ -6,8 +6,8 @@ const bowlerArray = [];
 
 window.addEventListener('DOMContentLoaded',async()=>{
     const tournamentId = (localStorage.getItem('tournamentId'))
-    // console.log(tournamentId);
     const matchData = await axios.get(`/match/api/getMatch/${tournamentId}`,{headers:{'authorization':token}});
+    console.log(matchData.status)
     const team1Id = matchData.data.match.team1Id;
     const team2Id = matchData.data.match.team2Id;
     const matchId = matchData.data.match.id;

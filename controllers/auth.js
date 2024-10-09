@@ -1,39 +1,44 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const sequelize = require('../utils/database');
+const mongoose = require('mongoose');
 const ApiError = require('../utils/ApiErrors');
 const {asyncErrorHandler} = require('../utils/asyncErrorHandler')
 
-const user = require('../models/user');
-const userData = require('../models/userData');
+const User = require('../models/user');
+const UserData = require('../models/userData');
 
 const hashService = require('../services/bcrypt');
 
 exports.signup = asyncErrorHandler(async(req,res)=>{
-    const transaction = await sequelize.transaction();
+    const session = await mongoose.startSession()
     try{
+        session.startTransaction()
         let {name , password ,playerType} = req.body;
         name = name.trim();
         password = password.trim();
         if(isNullValue(name) || isNullValue(password) ||isNullValue(playerType)){
             throw new ApiError("invalid input!",400);
         }
-        const isExist = await user.findOne({where:{name:name}})
-        if(isExist)throw new ApiError('username already exists!' ,400)
+        const isExist = await User.findOne({name:name})
+        if(isExist)throw new ApiError('username already exists!' ,400);
         const hash = await hashService.createHash(password);
-        const newUser = await user.create({
-                    name,
+        const newUser = new User({
+                    name:name,
                     password:hash,
                     role:'player'
-        },{transaction})
-        await userData.create({
+        })
+        const newUserData = new UserData({
                     userId:newUser.id,
                     playerType:playerType
-        },{transaction})
-        await transaction.commit();
+        })
+        await newUser.save({ session })
+        await newUserData.save({ session });
+        await session.commitTransaction();
+        session.endSession()
         res.status(201).json({success:true});      
     }catch(err){
-        await transaction.rollback();
+        await session.abortTransaction();
+        session.endSession()
         throw new ApiError(err.message ,err.statusCode)
     }
     
@@ -43,19 +48,18 @@ exports.login = asyncErrorHandler(async(req,res)=>{
         const {name , password} = req.body;
         if(isNullValue(name) || isNullValue(password))throw new ApiError('invalid input!' ,400)
 
-        let checkUser = await user.findOne({where:{name:name}});
+        let checkUser = await User.findOne({name:name});
         if(!checkUser)throw new ApiError("user not found",404);
         await hashService.compareHash(password ,checkUser.password);
-        let link = '../home/index.html';
-        if(checkUser.role === 'organization')link = '../organization-home/index.html';
+        let link = '';
         if(checkUser.role === 'admin')link = '../admin/index.html'
-        res.status(200).json({success:true , token:generateAccessToken(checkUser.id,checkUser.name,checkUser.role) ,link});      
+        res.status(200).json({success:true , token:generateAccessToken(checkUser._id,checkUser.name,checkUser.role) ,link});      
 })
 
 function isNullValue(value){
     return value === ""?true :false;
 }
 
-function generateAccessToken(id, name ,role){
-    return jwt.sign({id,name,role},process.env.TOKENKEY);
+function generateAccessToken(_id, name ,role){
+    return jwt.sign({_id,name,role},process.env.TOKENKEY);
 }

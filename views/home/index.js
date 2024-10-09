@@ -21,11 +21,12 @@ const token = localStorage.getItem('token');
 window.addEventListener('DOMContentLoaded',async()=>{
     try {
         const data = await axios.get('/tournament/api/ongonigTournaments',{headers:{'Authorization':token}});
-        if(data.data.info.length === 0){
+        console.log(data.data)
+        if(data.data.tournaments.length === 0){
             displayNoTournament()
         }else{
-            data.data.info.forEach((t)=>{
-                displayTournaments(t.id , t.name ,t.startDate ,t.endDate ,t.address);
+            data.data.tournaments.forEach((t)=>{
+                displayTournaments(t._id , t.name ,t.startDate ,t.endDate ,t.address);
             });
         }
         const userNameH1 = document.getElementById('userNameH1');
@@ -51,7 +52,7 @@ showTeam.onclick = async()=>{
     if(showTeamDiv.innerHTML === ''){
         clearMainDiv();
         const data = await axios.get('/team/api/',{headers:{'Authorization':token}});
-            data.data.team.forEach((t)=>{
+            data.data.teams.forEach((t)=>{
                 displayTeam(t.id ,t.name);
             });
             showTeamDiv.style.display = 'flex'
@@ -147,10 +148,10 @@ leaderboard.onclick = async()=>{
             const batterData = await axios.get('/user/api/top5/batter',{headers:{'Authorization':token}});
             const bowlerData = await axios.get('/user/api/top5/bowler',{headers:{'Authorization':token}});
             batterData.data.top5.forEach((b)=>{
-                displayBatterBoard(b.user.name  , b.runs)
+                displayBatterBoard(b.userId.name  , b.runs)
             })
             bowlerData.data.top5.forEach((b)=>{
-                displayBowlerBoard(b.user.name  , b.wickets)
+                displayBowlerBoard(b.userId.name  , b.wickets)
             })
         } catch (err) {
             alert(err.response.data.message)
@@ -159,8 +160,6 @@ leaderboard.onclick = async()=>{
         clearMainDiv();
         showTournament();
     }
-    
-    
 }
 
 displayPlayers.addEventListener('click',async(e)=>{
@@ -195,7 +194,7 @@ function displayBowlerBoard(name,runs){
 function displayTournaments(id , name , startDate , endDate , location){
     const div = document.createElement('div');
     div.innerHTML = `<div id="${id}">
-    <h4>${name}</h4><a>(${startDate} - ${endDate}) (${location})</a>
+    <h4>${name}</h4><a>(${startDate} - ${endDate}) (V:${location.village}, T:${location.taluka})</a>
     <button class="watchScore">watch score</button>
     </div>`;
     tournaments.appendChild(div);

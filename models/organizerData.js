@@ -1,21 +1,12 @@
-const Sequelize = require('sequelize');
+const mongoose = require('mongoose');
 
-const sequelize = require('../utils/database');
+const Schema = mongoose.Schema;
 
-const organizerData = sequelize.define('organizerData',{
-    email:{
-        type:Sequelize.STRING,
-        alllowNull:false,
-        unique:true
-    },
-    village:{
-        type:Sequelize.STRING,
-        allowNull:false
-    },
-    taluka:{
-        type:Sequelize.STRING,
-        allowNull:false
-    },
+const schema = new Schema({
+    email:{type:Schema.Types.String,require:true,unique:true},
+    village:{type:Schema.Types.String,require:true},
+    taluka:{type:Schema.Types.String,require:true},
+    userId :{ type: Schema.Types.ObjectId, ref: 'user' }
 })
 
-module.exports = organizerData;
+module.exports = mongoose.model('organizerData',schema);

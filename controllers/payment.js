@@ -13,7 +13,7 @@ exports.purchasePremium = asyncErrorHandler(async(req,res)=>{
 exports.updatePremium = asyncErrorHandler(async(req,res)=>{
         const {order_id,payment_id,status} = req.body;
         if(isNullValue(order_id) || isNullValue(payment_id)||isNullValue(status))throw new ApiError('invalid input!' ,400)
-        await order.update({status:status,paymentId:payment_id},{where:{orderId:order_id}})
+        await order.update({orderId:order_id},{status:status,paymentId:payment_id})
         res.status(200).json({success:true})
 })
 

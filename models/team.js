@@ -1,21 +1,11 @@
-const Sequelize = require('sequelize');
+const mongoose = require('mongoose');
 
-const sequelize = require('../utils/database');
+const Schema = mongoose.Schema;
 
-const team = sequelize.define('team',{
-    name:{
-        type:Sequelize.STRING,
-        allowNull:false,
-    },
-    captainName:{
-        type:Sequelize.STRING,
-        unique:true,
-        allowNull:false
-    },
-    password:{
-        type:Sequelize.STRING,
-        allowNull:false
-    }
+const schema = new Schema({
+    name:{type:Schema.Types.String,require:true},
+    captainName:{type:Schema.Types.String,require:true,unique:true},
+    password:{type:Schema.Types.String,require:true},
 })
 
-module.exports  = team;
+module.exports = mongoose.model('team',schema);

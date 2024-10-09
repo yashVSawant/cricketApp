@@ -1,26 +1,13 @@
-const Sequelize = require('sequelize');
+const mongoose = require('mongoose');
 
-const sequelize = require('../utils/database');
-// const { format } = require('mysql2');
+const Schema = mongoose.Schema;
 
-const tournament = sequelize.define('tournament',{
-    name:{
-        type:Sequelize.STRING,
-        allowNull:false
-    },
-    startDate:{
-        type:Sequelize.DATE,
-        allowNull:false
-    },
-    endDate:{
-        type:Sequelize.DATE,
-        allowNull:false
-    },
-    address:{
-        type:Sequelize.STRING,
-        allowNull:false
-    }
-
+const schema = new Schema({
+    name:{type:Schema.Types.String,require:true},
+    startDate:{type:Schema.Types.Date,require:true},
+    endDate:{type:Schema.Types.Date,require:true},
+    address:{village:{type:Schema.Types.String,require:true},taluka:{type:Schema.Types.String,require:true}},
+    userId:{ type: Schema.Types.ObjectId, ref: 'user'},
 })
 
-module.exports = tournament;
+module.exports = mongoose.model('tournament',schema);

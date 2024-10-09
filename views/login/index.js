@@ -12,7 +12,6 @@ login.addEventListener('click',async(e)=>{
             const link = data.data.link;
             localStorage.setItem('token',`Bearer ${data.data.token}`);
             localStorage.setItem('userName',name);
-            
             window.location.href = link;
         } catch (err) {
             alert(err.response.data.message);

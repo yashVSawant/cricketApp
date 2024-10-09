@@ -7,7 +7,8 @@ const cors = require('cors');
 const fs = require('fs')
 
 const bodyParser = require("body-parser");
-const sequelize = require('./utils/database');
+
+const mongoose = require('mongoose')
 
 const app = express();
 
@@ -19,80 +20,46 @@ const organizationRoutes = require('./routers/organization');
 const teamRoutes = require('./routers/team');
 const matchRoutes = require('./routers/match');
 const paymentRoutes = require('./routers/payment');
+const liveRoutes = require('./routers/live')
 
 const {authenticate} = require('./middlewares/authentication');
 const {errorHandler} = require('./middlewares/errorHandler');
 
-const  batterLiveData = require('./models/batterLiveData');
-const  bowlerLiveData = require('./models/bowlerLiveData');
-const  user = require('./models/user');
-const  userData = require('./models/userData');
-const  organizerData = require('./models/organizerData');
-const  tournament = require('./models/tournament');
-const  match = require('./models/match');
-const  team = require('./models/team');
-const  teamList = require('./models/teamList');
-const order = require('./models/order');
-
-userData.belongsTo(user);
-user.hasOne(userData);
-organizerData.belongsTo(user);
-user.hasOne(organizerData);
-batterLiveData.belongsTo(user);
-user.hasOne(batterLiveData);
-bowlerLiveData.belongsTo(user);
-user.hasOne(bowlerLiveData);
-batterLiveData.belongsTo(match);
-match.hasOne(batterLiveData);
-bowlerLiveData.belongsTo(match);
-match.hasOne(bowlerLiveData);
-tournament.belongsTo(user);
-user.hasMany(tournament);
-match.belongsTo(tournament);
-tournament.hasMany(match);
-order.belongsTo(user);
-user.hasMany(order);
-team.belongsToMany(user,{ through: teamList });
-user.belongsToMany(team,{ through: teamList });
-
+const  User = require('./models/user');
 
 app.use(cors({origin:'*'}));
 app.use(express.static('views'));
 app.use(bodyParser.json());
-app.use(authenticate);
 
 app.use('/auth/api',authRoutes);
-app.use('/user/api',userRoutes);
-app.use('/tournament/api',tournamentRoutes);
-app.use('/organization/api',organizationRoutes);
-app.use('/team/api',teamRoutes);
-app.use('/match/api',matchRoutes);
-app.use('/payment/api',paymentRoutes);
+
+app.use('/user/api',authenticate,userRoutes);
+app.use('/tournament/api',authenticate,tournamentRoutes);
+app.use('/team/api',authenticate,teamRoutes);
+app.use('/live/api',authenticate,liveRoutes);
+app.use('/organization/api',authenticate,organizationRoutes);
+app.use('/match/api',authenticate,matchRoutes);
+app.use('/payment/api',authenticate,paymentRoutes);
 
 app.use((req,res)=>{
-        if(fs.existsSync(path.join(__dirname,'views',`${req.url}`))){
-            res.sendFile(path.join(__dirname,'views',`${req.url}`))  
-        }else{
-            res.redirect('/error/index.html') 
-        }
-        
+        res.status(404).json({success:false , message:'not found!'})      
 })
 app.use(errorHandler)
 
-sequelize
-.sync()
-// .sync({force:true})
+mongoose.connect(process.env.MONGODB_URI)
 .then(()=>{
     const server = app.listen(process.env.PORT || 3000, async() => {
         try{
-            const getUser = await user.findOne({where:{name:process.env.ADMIN_USERNAME}});
+            const getUser = await User.findOne({name:process.env.ADMIN_USERNAME});
             if(!getUser){
                 const hash = await hashService.createHash(process.env.ADMIN_PASSWORD);
-                await user.create({
+                const newUser = new User({
                     name:process.env.ADMIN_USERNAME,
                     password:hash,
                     role:'admin'
                 })
+                await newUser.save();
+                console.log('user saved')
             }
             console.log('running')
         }catch(err){
@@ -101,7 +68,8 @@ sequelize
         
     });
 
-    const io = socketIo(server);
+    const io = socketIo(server,{cors:{origin:"*"}});
+
     io.on('connect',(socket)=>{
         socket.on('watch-score',(matchId)=>{
             socket.join(matchId);

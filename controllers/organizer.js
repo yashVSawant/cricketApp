@@ -1,43 +1,42 @@
 require('dotenv').config();
-const user = require('../models/user');
-const hashService = require('../services/bcrypt');
-const organizerData = require('../models/organizerData');
-const sequelize = require('../utils/database');
+const User = require('../models/user');
+const mongoose = require('mongoose')
+const OrganizerData = require('../models/organizerData');
 const ApiError = require('../utils/ApiErrors');
 const {asyncErrorHandler} = require('../utils/asyncErrorHandler');
 
 exports.signup = asyncErrorHandler(async(req ,res)=>{
-    const transaction = await sequelize.transaction();
+    const session = await mongoose.startSession();
     try{
-        const {name ,email ,village,taluka,password} = req.body;
-        if(isNullValue(name)||isNullValue(email)||isNullValue(village)||isNullValue(taluka)||isNullValue(password))throw ApiError('invalid input!',400)
-        const isExist = await user.findOne({where:{name:name}});
-        if(isExist)throw new ApiError('organization already exist' ,400)
-            const hash = await hashService.createHash(password);
-            const organizer = await user.create({
-                name:name,
-                password:hash,
-                role:'organization'
-            },{transaction})
-            await organizerData.create({
+        session.startTransaction();
+        const {name ,email ,village,taluka} = req.body;
+        if(isNullValue(name)||isNullValue(email)||isNullValue(village)||isNullValue(taluka))throw ApiError('invalid input!',400)
+        
+            const getUser = await User.findOne({name:name});
+            if(!getUser)throw ApiError('user not found!',404);
+            getUser.role = 'organization';
+            const newOrganizerData = new OrganizerData({
                 email,
                 village,
                 taluka,
-                userId:organizer.id
-            },{transaction}) ;
-            await transaction.commit();
+                userId:getUser._id
+            }) ;
+            await getUser.save({session})
+            await newOrganizerData.save({session})
+            await session.commitTransaction();
+            session.endSession();
             res.status(201).json({success:true});
         
     }catch(err){
-        // console.log(err)
-        await transaction.rollback();
+        await session.abortTransaction();
+        session.endSession();
         throw new ApiError(err.message ,err.statusCode)
     }
 
 })
 
 exports.getOrganization = asyncErrorHandler(async(req,res)=>{
-        const organizations = await user.findAll({where:{role:'organization'},attributes:['id','name']});
+        const organizations = await User.find({role:'organization'}).select('_id name');
         res.status(200).json({success:true,organizations});
 })
 

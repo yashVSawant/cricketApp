@@ -1,14 +1,11 @@
-const Sequelize = require('sequelize');
+const mongoose = require('mongoose');
 
-const sequelize = require('../utils/database');
+const Schema = mongoose.Schema;
 
-const teamList = sequelize.define('teamList',{
-    id:{
-        type:Sequelize.INTEGER,
-        allowNull:false,
-        autoIncrement:true,
-        primaryKey:true
-    }
-});
+const schema = new Schema({
+        name:{type:Schema.Types.String,require:true},
+        userId:{ type: Schema.Types.ObjectId, ref: 'user' },
+        teamId:{ type: Schema.Types.ObjectId, ref: 'team' },
+})
 
-module.exports = teamList;
+module.exports = mongoose.model('teamList',schema);

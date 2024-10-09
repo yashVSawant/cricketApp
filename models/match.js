@@ -1,64 +1,28 @@
-const Sequelize = require('sequelize');
+const mongoose = require('mongoose');
 
-const sequelize = require('../utils/database');
+const Schema = mongoose.Schema;
 
-const match = sequelize.define('match',{
-    isLive:{
-        type:Sequelize.BOOLEAN,
-        defaultValue:true,
+const schema = new Schema({
+    isLive:{type:Schema.Types.Boolean,default:true},
+    overs:{type:Schema.Types.Number,require:true},
+    inning:{type:Schema.Types.Number,require:true,default:1},
+    team1:{
+        teamId:{ type: Schema.Types.ObjectId, ref: 'team' },
+        name:{type:Schema.Types.String,require:true},
+        runs:{type:Schema.Types.Number,require:true,default:0},
+        wickets:{type:Schema.Types.Number,require:true,default:0},
+        balls:{type:Schema.Types.Number,require:true,default:0},
     },
-    overs:{
-        type:Sequelize.INTEGER,
-        alllowNull:false
+    team2:{
+        teamId:{ type: Schema.Types.ObjectId, ref: 'team' },
+        name:{type:Schema.Types.String,require:true},
+        runs:{type:Schema.Types.Number,require:true,default:0},
+        wickets:{type:Schema.Types.Number,require:true,default:0},
+        balls:{type:Schema.Types.Number,require:true,default:0},
     },
-    team1Id:{
-        type:Sequelize.INTEGER,
-        alllowNull:false
-    },
-    team2Id:{
-        type:Sequelize.INTEGER,
-        alllowNull:false
-    },
-    team1Runs:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    },
-    team2Runs:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    },
-    team1Wickets:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    },
-    team2Wickets:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    },
-    team1Overs:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    },
-    team2Overs:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    },
-    team1Balls:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    },
-    team2Balls:{
-        type:Sequelize.INTEGER,
-        alllowNull:false,
-        defaultValue:0
-    }
-});
+    createdAt: { type: Date, default: Date.now },
+    tournamentId :{ type: Schema.Types.ObjectId, ref: 'tournament' },
+    wonTeamId:{ type: Schema.Types.ObjectId, ref: 'team' }
+})
 
-module.exports = match;
+module.exports = mongoose.model('match',schema);

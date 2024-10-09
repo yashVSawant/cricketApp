@@ -18,19 +18,13 @@ submit.addEventListener('click',async(e)=>{
     try {
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
         const village = document.getElementById('village').value;
         const taluka = document.getElementById('taluka').value;
-        if(!name || !email || !password || !confirmPassword || !village || !taluka )throw new Error('please fill all fields')
-        if(password.trim() != password)throw new Error('password can not have leading or trailing spaces!');
-        if(password.length < 8)throw new Error('password must have atleast 8 characters!');
-        if(password != confirmPassword)throw new Error('password did not match!');
-        const data = await axios.post('/organization/api/',{name,email,password,village,taluka},{headers:{'Authorization':token}});
+        if(!name || !email || !village || !taluka )throw new Error('please fill all fields')
+        const data = await axios.post('/organization/api/',{name,email,village,taluka},{headers:{'Authorization':token}});
         console.log(data.data)
         document.getElementById('name').value="";
         document.getElementById('email').value="";
-        document.getElementById('password').value="";
         document.getElementById('confirmPassword').value="";
         document.getElementById('village').value="";
         document.getElementById('taluka').value="";

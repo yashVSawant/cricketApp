@@ -7,7 +7,7 @@ const routes = express.Router();
 
 routes.post('/',restrictTo(['organization']),controller.postTournament);
 routes.get('/',restrictTo(['organization']),controller.getTournaments);
-routes.get('/ongonigTournaments',restrictTo(['player']),controller.ongoingTournaments);
+routes.get('/ongonigTournaments',controller.ongoingTournaments);
 
 
 module.exports = routes;

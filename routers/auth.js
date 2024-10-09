@@ -7,7 +7,7 @@ const routes = express.Router();
 
 routes.post('/signup',userAuthController.signup);
 routes.post('/login',userAuthController.login);
-routes.post('/admin/login',adminAuthController.login)
+// routes.post('/admin/login',adminAuthController.login)
 
 
 module.exports = routes;

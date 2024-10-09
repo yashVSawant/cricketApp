@@ -551,7 +551,7 @@ async function matchEnd(){
     alert(`${wonTeam} ${result} !`);
     alert('match end');
     inningEnd();
-    await axios.put(`/match/api//endMatch`,{},{headers:{'Authorization':token}})
+    await axios.put(`/match/api/endMatch`,{},{headers:{'Authorization':token}})
     updateButtons.style.display = 'none'
     window.location.href = '../organization-home/index.html'
 }
